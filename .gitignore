@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+# Secrets (API key / password) — never commit
+.env
+
+# macOS
+.DS_Store
+
+# ข้อมูลส่วนตัว (บันทึกหนัง, โปรไฟล์ + รูปบนบัตร) — เก็บไว้ในเครื่องเท่านั้น
+data/
+
+# ตั้งค่าของ Claude Code (ใช้เปิดแอปทดสอบ) — ไม่เกี่ยวกับตัวแอป
+.claude/

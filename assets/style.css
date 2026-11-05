@@ -1,0 +1,2030 @@
+/* หน้า Login */
+@import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap");
+/* ลายมือตัวเขียนต่อกัน (placeholder ช่องรหัสผ่าน) */
+@import url("https://fonts.googleapis.com/css2?family=La+Belle+Aurore&display=swap");
+/* ลายเซ็นบนบัตร MOVIE LOVER CLUB */
+@import url("https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap");
+/* ตัวหนาแคบแบบบัตรใบอนุญาต (การ์ด MOVIE LOVER CLUB) */
+@import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
+/* ลายมืออ่านง่าย (ข้อมูลหนังในหน้ารายละเอียด) */
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Caveat+Brush&display=swap");
+/* ลายมือปากกาเส้นบาง (ชื่อบนโพลารอยด์นักแสดง) */
+@import url("https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap");
+/* ตัวพิมพ์ดีดเรียบ (เลขหน้า) */
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap");
+/* ตัวหนังสือแคบเรียบ (Watchlist แบบ photo dump) */
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Oswald:wght@300;700&display=swap");
+/* serif ตัวพิมพ์ใหญ่แบบตัวปั๊ม (หัวข้อบนการ์ดค้นหา หน้า 2) */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400&display=swap");
+/* ตัวพิมพ์ดีดสมัยใหม่ (รายการหนังแบบ playlist หน้า 3) */
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono&display=swap");
+/* ช่องค้นหา */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+/* Lora = หัวข้อแบบ serif, Work Sans = ข้อความทั่วไป/ปุ่ม */
+/* ตั๋วรีวิว: ตัวพิมพ์ + ลายมือ */
+@import url("https://fonts.googleapis.com/css2?family=Sometype+Mono&family=Gaegu:wght@700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap");   /* ชื่อเดือนในปฏิทิน */
+@import url("https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&family=Mali:wght@300&display=swap");   /* หน้าคู่ My Journal: ลายมืออังกฤษ + ไทย */
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Work+Sans:wght@400;600&display=swap");
+
+body {
+    margin: 0; /* ลบขอบขาวรอบจอ */
+    background-image: url("paper_texture.jpg");
+    background-color: #FBB6B6;
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow-x: hidden;                 /* สมุดย่อตามหน้าต่างแล้ว (assets/fit.js) → ไม่ต้องมีแถบเลื่อนแนวนอน */
+}
+
+/* หน้า Login */
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;                  /* สูงอย่างน้อยเต็มจอ */
+    font-family: "Lora", Georgia, serif;
+    color: #4A3B35;                     /* พื้นหลังใช้ของ body */
+}
+
+.book {
+    position: relative;
+    width: 420px;
+    height: 580px;
+    perspective: 2000px;                /* มุมมอง 3 มิติ ให้ปกพลิกดูมีระยะลึก */
+}
+
+/* ขอบกระดาษข้าง */
+.book::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    bottom: 14px;
+    right: -8px;
+    width: 30px;
+    border-radius: 0 6px 6px 0;
+    background: #F3EBDD;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* แถบอินเด็กซ์หน้า Login: แถบชุดเดียวกับตอนเปิดสมุด (.book-tabs ด้านล่าง) วางตำแหน่งเดียวกัน
+   อยู่เหนือปก (ไม่โดนเงาปกทับจนหม่น) แต่ตัด 6px ซ้ายที่ซ่อนอยู่ใต้ปกออก → ดูเหมือนโผล่ออกมาจากใต้ปก */
+.login-tabs {
+    z-index: 3;
+    clip-path: inset(-12px -12px -12px 6px);
+    pointer-events: none;
+}
+
+/* แถบอินเด็กซ์ทางขวาของหน้าอื่น ๆ (อยู่หลังกระดาษ โผล่แค่ส่วนที่ยื่นออกมา) */
+.book-tabs {
+    position: absolute;
+    top: 50px;
+    right: -30px;                       /* เริ่มจากขอบขวาของหน้ากระดาษ (เว้นขอบ 6px) → แถบต่อจากกระดาษ */
+    z-index: 1;                         /* ระดับเดียวกับหน้ากระดาษ อยู่เหนือปกหลัง */
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.book-tab {
+    width: 36px;
+    height: 130px;                      /* สูงพอให้ "Search a movie" อยู่ในแถบบรรทัดเดียว */
+    padding: 12px 0;
+    box-sizing: border-box;
+    border-radius: 0 10px 10px 0;
+    background: #F3EBDD;
+    box-shadow: 3px 2px 6px rgba(0, 0, 0, 0.15);
+    writing-mode: vertical-rl;          /* ตัวหนังสือแนวตั้ง */
+    white-space: nowrap;                /* ไม่ตัดขึ้นบรรทัดใหม่ เช่น "Search a movie" ต่อกันยาว ๆ */
+    text-align: center;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #7A6A58;
+}
+
+/* แถบคู่สีเข้มขึ้น */
+.book-tab:nth-child(even) {
+    background: #E9DFCB;
+}
+
+/* แถบที่เป็นลิงก์ (Home / Search a movie) — กดได้ ไม่มีเส้นใต้ */
+a.book-tab {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* เอาเมาส์ไปวาง หรือเป็นหน้าที่เปิดอยู่: แถบยื่นออกมาอีกนิด ตัวหนังสือเข้มขึ้น */
+a.book-tab:hover,
+.book-tab.active {
+    transform: translateX(4px);
+    color: #4A3B35;
+}
+
+/* ปกสมุด = รูป login_cover.png (export จาก Figma: หัวข้อ, quote, กรอบ PASSWORD, Open, COPYRIGHT, เงาสัน) */
+.book-cover {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;        /* พลิกเกินครึ่งแล้วซ่อนด้านหน้า → เห็นด้านในปกแทน */
+    color: #F1E6D6;                     /* ตัวหนังสือสีครีม (ช่องรหัส + ข้อความแจ้งผล) */
+    background: url("book_cover.png") 0 0 / 100% 100%;
+    border-radius: 4px 12px 12px 4px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);   /* เงาสมุด */
+}
+
+/* เปิดสมุดตอน login สำเร็จ  */
+/* ตัวที่พลิก: ห่อปกหน้า + ปกหลัง */
+.book-flip {
+    position: absolute;
+    inset: 0;
+    z-index: 2;                         /* อยู่เหนือแถบอินเด็กซ์และขอบกระดาษ */
+    transform-origin: left center;
+    transform-style: preserve-3d;       /* ให้ปกหน้า/หลังอยู่ในพื้นที่ 3 มิติเดียวกัน */
+    transition: transform 1.4s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: transform;             /* ให้เบราว์เซอร์เตรียมเลเยอร์ไว้ → ไม่กระตุก */
+}
+
+/* เงาบนปกที่เข้มขึ้นเรื่อย ๆ ตอนปกเอียงออกจากแสง */
+.book-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.05));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.7s ease-in;
+}
+
+.book.opening .book-cover::after {
+    opacity: 1;
+}
+
+/* ด้านในปก (เห็นตอนปกพลิกไปทางซ้าย) */
+.book-cover-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px 4px 4px 12px;
+    background: url("book_cover.jpg") center / cover;
+    box-shadow: inset -12px 0 0 rgba(0, 0, 0, 0.12);   /* สันสมุดอยู่ขวาเมื่อพลิกแล้ว */
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+}
+
+/* ปกหลัง */
+.book-back {
+    position: absolute;
+    inset: 0 -40px 0 0;
+    border-radius: 4px 12px 12px 4px;   /* สันซ้าย ขอบขวามน (เหมือนปกหน้า) */
+    background: url("book_cover.jpg") center / cover;
+    box-shadow: inset 12px 0 0 rgba(0, 0, 0, 0.12);    /* สันสมุดด้านซ้าย */
+    opacity: 0;                         /* หน้า Login ตอนปิดสมุด: ไม่แสดงปกหลัง */
+    transition: opacity 0.4s ease;
+}
+
+/* ตอนเปิดปก: ปกหลังค่อย ๆ ปรากฏ */
+.book.opening .book-back {
+    opacity: 1;
+}
+
+/* หน้ากระดาษด้านในใต้ปก */
+.book-inside {
+    position: absolute;
+    inset: 6px 6px 6px 0;
+    z-index: 1;
+    border-radius: 2px 10px 10px 2px;
+    background: url("paper_texture.jpg") center / cover, #F3EBDD;
+    background-blend-mode: multiply;
+    box-shadow: inset 10px 0 12px rgba(0, 0, 0, 0.12);   /* เงาตรงสัน */
+}
+
+/* ตอนเปิด: เลื่อนสมุดไปขวาให้ทั้งสองหน้าอยู่กลางจอ (พร้อมปกพลิก) แล้วซูมขยายขึ้นนิดหน่อย
+   transform-origin ขอบซ้ายของ .book = สันสมุด = กลางสมุดที่กางออก → ซูมออกจากกลางพอดี */
+.book.opening {
+    transform-origin: 0 50%;
+    animation: book-open 2s forwards;
+}
+
+@keyframes book-open {
+    0% {
+        transform: translateX(0) scale(1);
+        animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);   /* ช่วงเลื่อน: นุ่มแบบเดียวกับปกพลิก */
+    }
+    70% {                               /* 1.4s: ปกเปิดสุด */
+        transform: translateX(50%) scale(var(--book-open-scale, 1));
+        animation-timing-function: cubic-bezier(0.33, 0, 0.2, 1);    /* ช่วงซูม: เร่งแล้วค่อย ๆ หยุด */
+    }
+    100% {                              /* 2s: ซูมเสร็จ = ขนาดเดียวกับสมุดหน้า Home */
+        transform: translateX(50%) scale(var(--book-scale, 1.15));
+    }
+}
+
+.book.opening .book-flip {
+    transform: rotateY(-180deg);
+}
+
+/* ของตกแต่งบนปก + ขอบกระดาษข้าง ค่อย ๆ หายไปตั้งแต่เริ่มเปิด  */
+.book::before,
+.book-earphone,
+.book-clip {
+    transition: opacity 0.4s ease;
+}
+
+.book.opening::before,
+.book.opening .book-earphone,
+.book.opening .book-clip {
+    opacity: 0;
+}
+
+/* หูฟังวางทับสมุด */
+.book-earphone {
+    position: absolute;
+    top: 170px;
+    right: -215px;
+    width: 280px;
+    z-index: 3;                         /* อยู่เหนือปกสมุด */
+    transform: rotate(-12deg);
+    pointer-events: none;               /* ไม่บังการคลิกช่องรหัส/ปุ่ม */
+}
+
+/* คลิปรูปดาว */
+.book-clip {
+    position: absolute;
+    top: -38px;
+    left: 34px;
+    width: 80px;
+    z-index: 3;                         /* อยู่เหนือปกสมุด */
+    transform: rotate(-10deg);
+    filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.35));   /* เงาให้ดูเป็นลวดจริง */
+    pointer-events: none;
+}
+
+/* ช่องรหัส + ปุ่ม Open วางทับแถวล่างของกรอบ PASSWORD ในรูป (ด้านในเส้น: x 71, y 421, 278×61 จาก 420×580)
+   ใช้ % ของปก 420×580 */
+.password-row {
+    position: absolute;
+    left: 16.9%;
+    top: 72.59%;
+    width: 66.19%;
+    height: 10.52%;
+    display: flex;
+}
+
+.password-row .dash-input-container,
+.password-row .dash-input-container:focus-within,
+.password-row .dash-input-container:has(:focus-visible) {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+/* ช่องรหัสผ่าน */
+#password {
+    width: 100%;
+    height: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: 15px;
+    color: #F1E6D6;
+    text-align: center;
+}
+
+/* ข้อความในช่อง (หายไปตอนพิมพ์ → ไม่ได้อยู่ในรูป) */
+#password::placeholder {
+    font-family: "La Belle Aurore", cursive;
+    font-size: 22px;
+    color: rgba(241, 230, 214, 0.7);
+}
+
+/* ฟอนต์ลายมือ La Belle Aurore ลอยสูงกว่าเส้นกลาง → ดันลงตอนยังแสดง placeholder ให้อยู่กลางกรอบ */
+#password:placeholder-shown {
+    padding-top: 10px;
+}
+
+/* ปุ่ม Open: โปร่งใสทับคำ Open ในรูป (ด้านในเส้น กว้าง 68.5 จาก 278) */
+#btn-submit {
+    flex: 0 0 24.6%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+#btn-submit:hover {
+    background-color: rgba(241, 230, 214, 0.15);
+}
+
+/* ข้อความแจ้งผล เช่น "Password not set", "Wrong password" — ใต้กรอบ 12px */
+#output {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 84.7%;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* หน้า Home */
+.home-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: "Lora", Georgia, serif;
+    color: #4A3B35;
+}
+
+/* สมุดที่เปิดอยู่ */
+.home-book {
+    display: flex;
+    width: 840px;
+    height: 580px;
+    /* ขนาดเท่าตอนซูมเสร็จในหน้า Login — จอเล็กกว่าสมุด → ย่อให้พอดีจอ (--book-scale ตั้งใน assets/fit.js) */
+    transform: scale(var(--book-scale, 1.15));
+}
+
+/* ซ้าย: ด้านในปกสีน้ำตาล */
+.home-cover {
+    position: relative;                 /* จุดอ้างอิงของหน้ากระดาษฝั่งซ้าย (ถ้ามี) */
+    perspective: 2200px;                /* มุมมอง 3 มิติ ให้หน้ากระดาษพลิกกลับไปขวาดูมีระยะลึก */
+    flex: 0 0 420px;
+    border-radius: 12px 4px 4px 12px;
+    background: url("book_cover.jpg") center / cover;
+    box-shadow: inset -12px 0 0 rgba(0, 0, 0, 0.12);   /* สันสมุดอยู่ขวา */
+}
+
+/* ขวา: ปกหลัง + หน้ากระดาษ + แถบอินเด็กซ์ต่อจากกระดาษ */
+.home-sheet {
+    position: relative;
+    flex: 0 0 420px;
+    perspective: 2200px;                /* มุมมอง 3 มิติ ให้หน้ากระดาษพลิกดูมีระยะลึก */
+}
+
+/* ปกหลัง */
+.home-sheet::before {
+    content: "";
+    position: absolute;
+    inset: 0 -40px 0 0;
+    border-radius: 4px 12px 12px 4px;
+    background: url("book_cover.jpg") center / cover;
+    box-shadow: inset 12px 0 0 rgba(0, 0, 0, 0.12);
+}
+
+/* หน้ากระดาษครีม */
+.home-content {
+    position: absolute;
+    inset: 6px 6px 6px 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;        /* เนื้อหาเริ่มจากบนหน้ากระดาษ */
+    gap: 10px;
+    padding: 32px;
+    box-sizing: border-box;
+    overflow-y: auto;                   /* เนื้อหายาวเกินหน้า → เลื่อนในหน้ากระดาษ */
+    overflow-x: hidden;                 /* ไม่ให้มีแถบเลื่อนแนวนอน */
+    border-radius: 2px 10px 10px 2px;
+    background: url("paper_texture.jpg") center / cover, #F3EBDD;
+    background-blend-mode: multiply;
+}
+
+/* ---------- เงาสันสมุด (แบบเดียวกับ "spine shadow" ใน Figma) ----------
+   แถบไล่เงา 90px ของหน้า 808/828px ใน Figma = 45px บนเว็บ ชิดสันทั้งสองฝั่ง ทุกหน้า
+   วางบนกล่องที่ไม่เลื่อน (.home-cover / .home-sheet) เงาจะได้อยู่กับที่ตอนเลื่อนเนื้อหาในหน้า
+   อยู่เหนือเนื้อหาหน้ากระดาษ (z-index 1) แต่ใต้หน้าที่กำลังพลิก (z-index 3) — กดทะลุได้ */
+:root {
+    --spine-shadow: rgba(31, 41, 56, 0.38) 0%, rgba(31, 41, 56, 0.2) 18%,
+                    rgba(31, 41, 56, 0.07) 50%, rgba(31, 41, 56, 0) 100%;
+}
+
+.home-sheet::after,
+.home-cover:has(.home-content-left)::after,
+.page-turn-front::after,
+.page-turn-back::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    z-index: 2;
+    width: 45px;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+/* หน้าขวา: เงาชิดซ้าย */
+.home-sheet::after,
+.page-turn-front::after,
+.page-turn-back.page-turn-right-back::after {
+    left: 0;
+    right: auto;
+    background: linear-gradient(to right, var(--spine-shadow));
+}
+
+/* หน้าซ้าย: เงาชิดขวา */
+.home-cover:has(.home-content-left)::after,
+.page-turn-back::after,
+.page-turn-front.page-turn-right-front::after {
+    left: auto;
+    right: 0;
+    background: linear-gradient(to left, var(--spine-shadow));
+}
+
+/* กระดาษซ้ายค่อยโผล่หลังหน้าที่พลิกตกลงมา (.home-content-left) → เงาสันฝั่งซ้ายโผล่พร้อมกัน */
+.home-cover:has(.home-content-left)::after {
+    animation: left-page-in 0.15s linear 0.85s both;
+}
+
+.home-cover.turning-back::after,
+.home-cover.keep-left::after {
+    animation: none;
+}
+
+/* หน้าที่กำลังพลิก: เงาอยู่ในแผ่นนั้นเอง เต็มความสูง */
+.page-turn-front::after,
+.page-turn-back::after {
+    top: 0;
+    bottom: 0;
+}
+
+@keyframes home-envelope-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* การ์ด MOVIE LOVER CLUB แบบบัตรประจำตัว ISIC เก่า (แนวนอน) เสียบอยู่ในซอง (ซองทับส่วนล่างของบัตร)
+   ทุกชิ้นวางแบบ absolute บนบัตรขนาด 760×500 (2 เท่า) แล้วย่อ/ขยายทั้งใบด้วย scale */
+.id-card {
+    position: absolute;
+    top: 156px;                         /* ทับกลางล่างของกระดาษ This or That */
+    left: -158px;
+    width: 760px;                       /* ออกแบบที่ 2 เท่า แล้วย่อด้วย scale (Firefox ไม่ยอมแสดงตัวหนังสือเล็กกว่า ~9px) */
+    height: 500px;
+    transform-origin: center;
+    z-index: 4;                         /* บนสุดของ 3 แผ่น */
+    box-sizing: border-box;
+    border-radius: 14px;
+    background: url("id_card_template.png") 0 0 / 100% 100%;   /* พื้นบัตรทั้งใบ export จาก Figma */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    transform: rotate(-5deg) scale(0.31);   /* เสียบแนวตั้งในซอง (หมุนตามเข็ม ~90° รูปอยู่บน), ย่อเหลือ ~180×274 */
+    font-family: "Courier Prime", "Courier New", monospace;
+    color: #1E1A18;
+    overflow: visible;                  /* ให้คลิปหนีบยื่นพ้นขอบบนได้ */
+    animation: home-envelope-in 0.6s ease 0.1s both;
+}
+
+/* กลับมาจากหน้า Search: รอหน้ากระดาษพลิกเสร็จก่อน (จังหวะเดียวกับซอง) */
+.id-card.after-turn {
+    animation: home-envelope-in 0.15s linear 0.85s both;
+}
+
+/* ---- ข้อมูลบนบัตร: ตำแหน่งทั้งหมด = ตำแหน่งช่องในรูป id_card_template.png (Figma, หน่วย 2 เท่า) ---- */
+/* รูปเต็มความสูงด้านซ้าย + ลวดเย็บ */
+.id-card-photo-wrap {
+    position: absolute;
+    top: 34px;
+    left: 30px;
+}
+
+.id-card-photo {
+    position: relative;
+    width: 228px;
+    height: 286px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    background: #E7E0D2;
+    cursor: pointer;
+}
+
+.id-card-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;                  /* ครอปให้เต็มกรอบ */
+    display: block;
+    /* โทนฟิล์ม: สีอุ่นซีดลงนิด ๆ คอนทราสต์ต่ำ */
+    filter: sepia(0.28) saturate(0.82) contrast(0.92) brightness(1.05) hue-rotate(-6deg);
+}
+
+/* ชั้นทับรูปให้ดูเป็นฟิล์ม (เฉพาะตอนมีรูป): ดำซีดออกม่วงอุ่น + ขอบมืด + เกรนฟิล์ม */
+.id-card-photo {
+    position: relative;
+}
+
+.id-card-photo:has(.id-card-photo-img)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;               /* ยังคลิกเลือกรูปใหม่ได้ */
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at center, transparent 55%, rgba(40, 24, 16, 0.35) 100%),
+        linear-gradient(rgba(255, 214, 170, 0.12), rgba(120, 90, 140, 0.12));
+    mix-blend-mode: overlay;
+    box-shadow: inset 0 0 0 200px rgba(60, 40, 30, 0.06);   /* ยกเงาดำให้ซีดแบบฟิล์ม */
+}
+
+.id-card-photo-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-family: "Courier Prime", "Courier New", monospace;
+    font-size: 28px;
+    color: #7A7266;
+}
+
+.isic-clip {
+    position: absolute;
+    top: -44px;
+    left: 24px;
+    height: 120px;
+    transform: rotate(-6deg);
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.35));
+    pointer-events: none;
+}
+
+/* ค่าในช่อง NAME / BORN / MEMBER SINCE / FAVORITE FILM (ตัวพิมพ์ดีด) */
+.id-card-input {
+    position: absolute;
+    height: 27px;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    box-sizing: border-box;
+    font-family: "Courier Prime", "Courier New", monospace;
+    font-size: 24px;
+    line-height: 27px;
+    color: #1E1A18;
+}
+
+.isic-name     { top: 163px; left: 344px; width: 240px; }
+.isic-birth    { top: 225px; left: 344px; width: 134px; }
+.isic-since    { top: 225px; left: 532px; width: 186px; }
+.isic-favorite { top: 367px; left: 344px; width: 374px; }
+
+/* Dash ใส่ class ไว้ที่กล่องห่อ → ช่องจริงข้างในต้องโปร่ง ไม่มีขอบ */
+.id-card-input input {
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+}
+
+.id-card .dash-input-container,
+.id-card .dash-input-container:focus-within,
+.id-card .dash-input-container:has(:focus-visible) {
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.id-card-input input::placeholder {
+    color: rgba(43, 37, 34, 0.3);
+}
+
+/* ลายเซ็น: กลางช่อง SIGNATURE (306, 64, 300×76) */
+.lic-sig {
+    position: absolute;
+    left: 456px;
+    top: 102px;
+    z-index: 2;
+    font-family: "Mrs Saint Delafield", cursive;
+    font-size: 64px;
+    line-height: 1;
+    color: #23408E;
+    white-space: nowrap;
+    transform: translate(-50%, -34%) rotate(-5deg);
+}
+
+/* เลขสมาชิกสีแดง ใต้ "Nº MJ" */
+.isic-no {
+    position: absolute;                 /* ตำแหน่ง/ฟอนต์ตาม Figma (id_card_template → Member no) ÷ 2 */
+    top: 136px;
+    left: 617px;
+    font-family: "Oswald", "Roboto Condensed", sans-serif;
+    font-weight: 300;
+    font-size: 38px;
+    letter-spacing: 2px;
+    line-height: 56px;
+    color: #A3453B;
+}
+
+/* วันที่เขียนมือหมึกน้ำเงิน ใต้ PLACE AND DATE */
+.isic-hand-date {
+    position: absolute;
+    top: 428px;
+    left: 478px;
+    z-index: 3;
+    font-family: "Caveat", cursive;
+    font-size: 34px;
+    font-weight: 500;
+    color: #23408E;
+    white-space: nowrap;
+}
+
+/* ตราประทับ = รูป mlc_stamp.png (Figma) + เลขสมาชิก — หมุนรอบมุมซ้ายบนแบบใน Figma */
+.isic-stamp {
+    position: absolute;
+    width: 176px;
+    height: 160.5px;
+    background: url("mlc_stamp.png") 0 0 / 100% 100%;
+    transform-origin: top left;
+    pointer-events: none;
+}
+
+.isic-stamp-photo { top: 236px; left: 140px; transform: rotate(-4deg); }
+.isic-stamp-right { top: 326px; left: 573px; transform: rotate(3deg); }
+
+.isic-stamp-no {
+    position: absolute;
+    top: 118px;
+    left: 0;
+    right: 0;
+    padding-left: 6px;                  /* ชดเชยระยะห่างตัวอักษรท้ายคำ → อยู่กลางพอดี */
+    font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    line-height: 30px;
+    text-align: center;
+    color: rgba(40, 44, 48, 0.75);
+}
+
+/* ปีสีเขียว + DEC 31 ตรงช่อง VALID (ตำแหน่ง/ฟอนต์ตาม Figma id_card_template ÷ 2) */
+.isic-stamp-year {
+    position: absolute;
+    top: 370px;
+    left: 626px;
+    font-family: "Oswald", "Anton", sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 47px;
+    color: #8CC25C;
+    pointer-events: none;
+}
+
+.isic-stamp-valid {
+    position: absolute;
+    top: 388px;
+    left: 706px;
+    font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 12px;
+    white-space: nowrap;
+    color: #8CC25C;
+    pointer-events: none;
+}
+
+/* การ์ดในซอง: กดได้ → เด้งออกมากลางจอ */
+.id-card-preview {
+    cursor: pointer;
+    transition: visibility 0s linear 0.45s, transform 0.2s ease;   /* กลับมาโผล่ตอนการ์ดกลางจอหดกลับเสร็จ */
+}
+
+.id-card-preview:hover {
+    transform: translateY(-8px) rotate(-5deg) scale(0.31);   /* ชี้แล้วการ์ดขยับขึ้นจากซองนิดนึง */
+}
+
+/* ตอนการ์ดเด้งออกมา: ซ่อนการ์ดในซอง (เหมือนถูกดึงออกไปแล้ว) */
+/* (ใช้ visibility ไม่ใช้ opacity เพราะ animation ตอนโผล่ของ .id-card คุม opacity ไว้อยู่) */
+.home-page:has(.id-modal.open) .id-card-preview {
+    visibility: hidden;
+    transition: visibility 0s;
+}
+
+/* ข้อความบนการ์ดในซอง (ไม่ใช่ช่องกรอก) สูงเท่าช่องกรอก แม้ยังไม่มีข้อความ */
+div.id-card-input {
+    min-height: 1.4em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ชั้นการ์ดกลางจอ: ปกติซ่อนไว้ */
+.id-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0s linear 0.45s;   /* รอการ์ดหดกลับเข้าซองเสร็จก่อนค่อยซ่อน */
+}
+
+.id-modal.open {
+    visibility: visible;
+    pointer-events: auto;
+    transition: visibility 0s;
+}
+
+/* พื้นหลังมืด กดแล้วเก็บการ์ดกลับเข้าซอง */
+.id-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(40, 28, 24, 0.45);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.35s ease;
+}
+
+.id-modal.open .id-backdrop {
+    opacity: 1;
+}
+
+/* การ์ดกลางจอ: เริ่มจากตำแหน่ง/ขนาดของการ์ดในซอง (ขวาของกลางจอ, สมุดขยาย 1.15 เท่า)
+   แล้วเด้งมากลางจอ ขยายใหญ่ ตั้งตรง */
+.id-card.id-card-modal {
+    position: relative;
+    top: auto;
+    left: auto;
+    z-index: 1;
+    opacity: 0;
+    transform-origin: center;
+    transform: translate(220px, 150px) scale(0.38) rotate(-5deg);
+    transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.15s ease;
+    animation: none;
+}
+
+.id-modal.open .id-card-modal {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.8) rotate(0deg);
+}
+
+/* จอเตี้ย: ย่อการ์ดกลางจอลง ไม่ให้ล้นจอ */
+@media (max-height: 700px) {
+    .id-modal.open .id-card-modal {
+        transform: translate(0, 0) scale(0.6) rotate(0deg);
+    }
+}
+
+/* ---------- กระดาษ This or That (หน้า Home) ----------
+   เช็กลิสต์พิมพ์ดีดบนกระดาษขาว มีรูเจาะซ้าย + โน้ตลายมือหมึกฟ้า/แดง (แบบกระดาษบันทึกการบิน)
+   ออกแบบที่ 420×560 แล้วย่อด้วย scale ตอนเสียบในซอง */
+.tot-sheet {
+    position: relative;
+    width: 420px;
+    height: 560px;
+    box-sizing: border-box;
+    background: url("this_or_that_template.png") 0 0 / 100% 100%;   /* กระดาษทั้งแผ่น export จาก Figma */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    font-family: "Courier Prime", "Courier New", monospace;
+    color: #2B2522;
+    overflow: hidden;
+}
+
+/* วันที่ข้างรูเจาะ (ตัวหนังสือแนวตั้ง) */
+.tot-side {
+    position: absolute;
+    left: 42px;
+    top: 464px;
+    font-size: 9px;
+    line-height: 10px;
+    white-space: nowrap;
+    transform-origin: top left;
+    transform: rotate(-90deg);
+}
+
+/* โน้ตหมึกฟ้าที่มีชื่อ เขียนเฉียงทับด้านบน */
+.tot-blue-note {
+    position: absolute;
+    top: 48px;
+    left: 70px;
+    width: 340px;
+    font-family: "Caveat", cursive;
+    font-size: 20px;
+    line-height: 1.05;
+    color: #2A4FA0;
+    transform-origin: top left;
+    transform: rotate(-9deg);
+    pointer-events: none;
+}
+
+/* จุดกดโปร่งใสทับคำในรูป (ตำแหน่งจาก TOT_BOXES ใน app.py) — คำที่เลือกมีวงหมึกฟ้าวาดมือล้อม */
+.tot-opt {
+    position: absolute;
+}
+
+.tot-modal-sheet .tot-opt {
+    cursor: pointer;
+}
+
+.tot-modal-sheet .tot-opt:hover {
+    background: rgba(42, 79, 160, 0.08);
+}
+
+.tot-on::after {
+    content: "";
+    position: absolute;
+    inset: -4px -6px;
+    border: 1.6px solid #2A4FA0;
+    border-radius: 50% 46% 52% 44% / 55% 48% 52% 45%;
+    transform: rotate(-3deg);
+    pointer-events: none;
+}
+
+/* ในซอง: เสียบอยู่หลังบัตร/โปสการ์ด เอียงไปซ้าย */
+.tot-preview {
+    position: absolute;
+    top: 64px;                          /* กลางหน้าแนวตั้ง */
+    left: 20px;
+    z-index: 2;
+    cursor: pointer;
+    transform-origin: top left;
+    transform: rotate(-2deg) scale(0.86);   /* แผ่นล่างสุด กินเกือบเต็มหน้า */
+    transition: transform 0.2s ease, visibility 0s linear 0.45s;
+    animation: home-envelope-in 0.6s ease 0.1s both;
+}
+
+.tot-preview.after-turn {
+    animation: home-envelope-in 0.15s linear 0.85s both;
+}
+
+.tot-preview:hover {
+    transform: translateY(-4px) rotate(-2deg) scale(0.86);
+}
+
+.home-page:has(#tot-modal.open) .tot-preview {
+    visibility: hidden;
+    transition: visibility 0s;
+}
+
+/* กลางจอ */
+.tot-modal-sheet {
+    z-index: 1;
+    opacity: 0;
+    transform: translate(-120px, 60px) scale(0.55) rotate(-8deg);
+    transition: transform 0.45s cubic-bezier(0.34, 1.3, 0.64, 1), opacity 0.15s ease;
+}
+
+#tot-modal.open .tot-modal-sheet {
+    opacity: 1;
+    transform: scale(1.15) rotate(-1deg);
+}
+
+/* หน้ากระดาษฝั่งซ้าย (กระดาษสองฝั่ง เช่นหน้า Search): กลับด้านจากฝั่งขวา
+   เว้นขอบปกด้านซ้าย/บน/ล่าง 6px ชิดสันด้านขวา, เงาตรงสันอยู่ขวา */
+.home-content-left {
+    inset: 6px 0 6px 16px;              /* เว้นซ้าย 16px ให้เห็นขอบปกน้ำตาลชัด ๆ */
+    border-radius: 10px 2px 2px 10px;
+}
+
+/* ---------- พลิกหน้ากระดาษตอนกด "Search a movie" ----------
+   ลำดับ: 0–0.9s หน้าขวา (ของหน้า Home) พลิกข้ามสันไปทางซ้าย
+          0.85–1s กระดาษซ้ายของหน้า Search ปรากฏตรงที่หน้ากระดาษตกลงมา แล้วหน้าที่พลิกหายไป */
+.page-turn {
+    position: absolute;
+    inset: 6px 6px 6px 0;               /* ตำแหน่งเดียวกับหน้ากระดาษขวา */
+    z-index: 3;                         /* อยู่เหนือเนื้อหาหน้าขวาระหว่างพลิก */
+    transform-origin: left center;      /* หมุนรอบสันสมุด */
+    transform-style: preserve-3d;
+    pointer-events: none;
+    animation:
+        page-turn 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards,
+        page-turn-hide 0.15s linear 0.85s forwards;
+}
+
+@keyframes page-turn {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(-180deg); }
+}
+
+@keyframes page-turn-hide {
+    to { opacity: 0; }
+}
+
+/* ด้านหน้า/ด้านหลังของหน้าที่พลิก: ลายกระดาษครีมแบบหน้ากระดาษปกติ */
+.page-turn-front,
+.page-turn-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;        /* แต่ละด้านเห็นได้ทีละด้าน */
+    background: url("paper_texture.jpg") center / cover, #F3EBDD;
+    background-blend-mode: multiply;
+}
+
+/* ด้านหน้า = หน้าขวาของหน้า Home (เงาตรงสันอยู่ซ้าย) */
+.page-turn-front {
+    border-radius: 2px 10px 10px 2px;
+}
+
+/* ด้านหลัง = กระดาษซ้ายของหน้า Search (เงาตรงสันอยู่ขวา) */
+.page-turn-back {
+    transform: rotateY(180deg);
+    border-radius: 10px 2px 2px 10px;
+}
+
+/* ---------- พลิกหน้ากระดาษกลับไปขวา ตอนกด "Home" จากหน้า Search ----------
+   ใช้ .page-turn-front / .page-turn-back (ลายกระดาษ) ร่วมกับการพลิกไปซ้าย แต่หมุนรอบขอบขวา (สัน) */
+.page-turn-right {
+    position: absolute;
+    inset: 6px 0 6px 16px;              /* ตำแหน่งเดียวกับกระดาษซ้ายของหน้า Search */
+    z-index: 3;
+    transform-origin: right center;     /* หมุนรอบสันสมุด */
+    transform-style: preserve-3d;
+    pointer-events: none;
+    animation:
+        page-turn-right 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards,
+        page-turn-hide 0.15s linear 0.85s forwards;
+}
+
+/* ระหว่างพลิกกลับ: ยกฝั่งซ้ายขึ้นเหนือฝั่งขวา ไม่งั้นหน้าที่พลิกข้ามสันไปจะมุดใต้หน้าขวา */
+.home-cover.turning-back {
+    z-index: 4;
+}
+
+/* พลิกกลับไปหน้าที่มีกระดาษซ้าย (My Journal → Search): กระดาษซ้ายของหน้าใหม่อยู่ใต้หน้าที่พลิก
+   → ต้องเห็นตั้งแต่แรก (ไม่ต้องรอหน้าที่พลิกตกลงมาแบบตอนพลิกไปซ้าย) */
+.home-cover.turning-back .home-content-left {
+    animation: none;
+}
+
+/* พลิกไปซ้ายจากหน้าที่มีกระดาษซ้ายอยู่แล้ว (Search → My Journal): กระดาษซ้ายอยู่ตลอด ไม่เห็นปกน้ำตาล
+   ซ่อนแค่เนื้อหาของหน้าใหม่ จนหน้าที่พลิกตกลงมาทับ (0.85s) */
+.home-cover.keep-left .home-content-left {
+    animation: none;
+}
+
+.home-cover.keep-left .home-content-left > * {
+    animation: left-page-in 0.15s linear 0.85s both;
+}
+
+@keyframes page-turn-right {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(180deg); }
+}
+
+/* ด้านหน้า = กระดาษซ้ายของหน้า Search (เงาตรงสันอยู่ขวา) */
+.page-turn-right-front {
+    border-radius: 10px 2px 2px 10px;
+}
+
+/* ด้านหลัง = หน้าขวาของหน้า Home (เงาตรงสันอยู่ซ้าย) */
+.page-turn-right-back {
+    border-radius: 2px 10px 10px 2px;
+}
+
+/* กระดาษซ้ายของหน้า Search: ซ่อนไว้จนหน้าที่พลิกตกลงมา แล้วค่อยแสดง */
+.home-content-left {
+    animation: left-page-in 0.15s linear 0.85s both;
+}
+
+@keyframes left-page-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+/* หน้ากระดาษที่กำลังพลิก: สลับด้านที่เห็นตอนพลิกได้ครึ่งทาง (0.45s) ด้วยเวลาแทน backface-visibility
+   (Firefox วาดทั้งสองด้านทับกัน → ด้านหลังที่เป็นลายฟ้าโดนด้านหน้าสีครีมบัง) */
+.page-turn-front {
+    animation: page-face-front 0.9s linear forwards;
+    backface-visibility: visible;       /* สลับด้านด้วยเวลาแล้ว — Firefox ซ่อนผิดด้านถ้าใช้ hidden */
+}
+
+.page-turn-back {
+    animation: page-face-back 0.9s linear forwards;
+    backface-visibility: visible;
+}
+
+@keyframes page-face-front {
+    0%, 49%   { visibility: visible; }
+    50%, 100% { visibility: hidden; }
+}
+
+@keyframes page-face-back {
+    0%, 49%   { visibility: hidden; }
+    50%, 100% { visibility: visible; }
+}
+
+/* พลิกกลับไปขวา: หน้าขวาของหน้าใหม่ยังไม่ควรเห็นจนหน้าที่พลิกตกลงมาทับ (0.85s)
+   → ปิดด้วยกระดาษเปล่าไว้ก่อน (ไม่งั้นเห็นปฏิทิน/ลายฟ้าโผล่ก่อนแล้วโดนทับ) */
+.home-cover.turning-back ~ .home-sheet .home-content::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-radius: inherit;
+    background: url("paper_texture.jpg") center / cover, #F3EBDD;
+    background-blend-mode: multiply;
+    box-shadow: inset 10px 0 12px rgba(0, 0, 0, 0.12);
+    animation: cover-until-landed 0s linear 0.85s forwards;
+}
+
+@keyframes cover-until-landed {
+    to { visibility: hidden; }
+}
+
+/* หน้ากระดาษที่กำลังพลิก: ใช้พื้นแบบเดียวกับหน้าจริง (ดู right_paper ใน app.py) */
+
+
+/* กระดาษตอนพลิก = รูปหน้าหนังจริง (หน้าซ้าย / ขวาของหน้ารายละเอียดหนัง) */
+.page-turn-front.paper-blue,
+.page-turn-back.paper-blue {
+    background: url("movie_right_page.jpg") center / 100% 100%;
+}
+
+.page-turn-front.paper-movie-left,
+.page-turn-back.paper-movie-left {
+    background: url("movie_left_page.jpg") center / 100% 100%;
+}
+
+
+/* หน้า Search a movie (/search)
+   ซ้าย: รูปจาก Figma + .cert-line (ช่องพิมพ์ชื่อหนัง + ปุ่มค้นหา + รายการแนะนำ) ขวา: รูปจาก Figma + #movie-info (รายการหนัง) */
+.home-content-left:has(.search-page-art) {
+    overflow: visible;                  /* รายชื่อหนังที่เด้งลงมาล้นหน้าได้ */
+}
+
+/* รูปทั้งหน้า export จาก Figma (Book → search_left_page / search_right_page, 2x) ปูเต็มหน้ากระดาษ */
+.search-page-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* เส้นเซ็นชื่อ: พิมพ์ชื่อหนังเป็นตัวเขียน + แว่นขยายท้ายเส้น */
+.cert-line {
+    position: absolute;                 /* วางทับเส้นเซ็นชื่อในรูป (ตำแหน่งตาม Figma ÷ 2) */
+    left: 93.5px;
+    top: 253px;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    width: 217px;
+    height: 35px;
+}
+
+.cert-line .dash-input-container,
+.cert-line .dash-input-container:focus-within,
+.cert-line .dash-input-container:has(:focus-visible) {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+#movie-title {
+    width: 100%;
+    padding: 0 0 2px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: "Work Sans", Arial, sans-serif;   /* ฟอนต์ธรรมดา อ่านง่าย */
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    line-height: 1.8;
+    text-align: center;
+    color: #5E3A30;
+}
+
+#movie-title::placeholder {
+    color: rgba(43, 40, 38, 0.3);
+}
+
+/* ปุ่มค้นหา = กรอบใสทับแว่นขยายที่วาดไว้ในรูป */
+.cert-search-btn {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-bottom: 7px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* รายการแนะนำใต้เส้น: กระดาษชมพูมีเส้นบรรทัดเดียวกับการ์ด, ตัวหนังสือน้ำตาล (Space Mono แบบ playlist)
+   โปสเตอร์เล็ก + ชื่อ + ปี ชิดซ้าย, ชี้แล้วแถบชมพูเข้มขึ้นนิด */
+.cert-suggest {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: -12%;
+    right: -12%;
+    z-index: 5;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(94, 58, 48, 0.35) transparent;
+    background:
+        url("paper_texture.jpg") center / cover,
+        #EBD3D2;
+    background-blend-mode: multiply, normal;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 8px 18px rgba(90, 50, 40, 0.18);
+    text-align: left;
+}
+
+.cert-suggest:empty {
+    display: none;
+}
+
+.cert-suggest-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 14px;
+    border-bottom: 1px solid rgba(170, 110, 110, 0.28);   /* เส้นบรรทัดสีเดียวกับการ์ด */
+    font-family: "Space Mono", "Courier Prime", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #5E3A30;
+    text-decoration: none;
+}
+
+.cert-suggest-row:hover {
+    background: rgba(170, 110, 110, 0.14);
+}
+
+.cert-suggest-img {
+    flex-shrink: 0;
+    width: 30px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.cert-suggest-noimg {
+    background: #D9BFBD;
+}
+
+.cert-suggest-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cert-suggest-year {
+    flex-shrink: 0;
+    font-size: 10px;
+    color: rgba(94, 58, 48, 0.55);
+}
+
+.cert-suggest-empty {
+    padding: 10px 14px;
+    font-family: "Space Mono", "Courier Prime", monospace;
+    font-size: 11px;
+    color: rgba(94, 58, 48, 0.6);
+}
+
+/* ---------- ผลการค้นหา (ดึงจาก TMDB) หน้าขวาของ Search ----------
+   .results-heading + .movie-list > .movie-row (แบบ playlist) */
+.movie-info-loading,
+#movie-info {
+    width: 100%;
+}
+
+/* ข้อความแจ้ง (ไม่พบ / เชื่อมต่อไม่ได้) */
+.search-message {
+    margin: 8px 0;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: 13px;
+}
+
+/* หน้าขวาของ Search: ลายพื้นจากรูป + รายการหนังวางบนกระดาษตรง ๆ (เลื่อนในกรอบ) */
+.home-content:has(.list-card) {
+    padding: 30px 30px 44px;
+    overflow: hidden;                   /* ลายพื้นล้นขอบ → ตัด, รายการเลื่อนในกรอบแทน */
+}
+
+.list-card {
+    position: relative;
+    z-index: 1;                         /* เหนือลายพื้น */
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+.list-card .movie-info-loading {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(43, 37, 34, 0.25) transparent;
+}
+
+/* หัวข้อเหนือรายการ: ตัวพิมพ์ใหญ่สีแดงอมชมพู แบบ "POPULAR" */
+.results-heading {
+    margin: 4px 0 14px;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #B5525C;
+}
+
+/* รายการหนังแบบ playlist: เลข | รูปเล็ก | ชื่อ + รายละเอียด */
+.movie-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.movie-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Space Mono", "Courier Prime", monospace;
+    color: #1E1A18;
+}
+
+/* เลข + รูป + ชื่อ = ลิงก์ไปหน้ารายละเอียด */
+.row-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.row-link:hover .row-title {
+    text-decoration: underline;
+}
+
+/* ปุ่ม ▶ Trailer ชิดขวาของแถว: กรอบมนเส้นบาง */
+.row-trailer {
+    flex-shrink: 0;
+    padding: 3px 9px;
+    border: 1px solid #1E1A18;
+    border-radius: 999px;
+    font-size: 9.5px;
+    color: #1E1A18;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.row-trailer:hover {
+    background: #1E1A18;
+    color: #F3EBDD;
+}
+
+.row-no {
+    flex: 0 0 18px;
+    font-size: 10px;
+    color: #4A4440;
+}
+
+/* โปสเตอร์เล็ก สัดส่วนโปสเตอร์เต็ม 2:3 (ไม่ครอป) */
+.row-img {
+    flex-shrink: 0;
+    width: 40px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.row-img-empty {
+    background: #CDBFAE;
+}
+
+.row-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.row-title {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.row-sub {
+    font-size: 10px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #A39A92;                     /* เทาจาง */
+}
+
+
+/* ---------- หมุดดาวมุมล่าง: กดเปลี่ยนหน้า ---------- */
+.page-pin {
+    position: absolute;
+    bottom: 10px;                       /* ชิดมุมล่างของหน้ากระดาษ */
+    z-index: 5;                         /* อยู่เหนือเนื้อหาในหน้ากระดาษ */
+    width: 26px;                        /* หมุดเล็ก ๆ */
+    font-size: 0;                       /* dcc.Link ไม่มีข้อความ */
+    transition: transform 0.2s ease;
+}
+
+.page-pin-next {
+    right: 12px;
+    transform: rotate(12deg);
+}
+
+.page-pin-prev {
+    left: 22px;                         /* กระดาษซ้ายเว้นขอบปก 16px */
+    transform: rotate(-12deg);
+}
+
+/* ชี้แล้วหมุดเด้งขึ้นนิดนึง */
+.page-pin-next:hover {
+    transform: rotate(24deg) scale(1.25);
+}
+
+.page-pin-prev:hover {
+    transform: rotate(-24deg) scale(1.25);
+}
+
+.page-pin-img {
+    display: block;
+    width: 100%;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+}
+
+
+/* ----------------------------------------------------------------------
+   ---------- ส่วนที่เหลือ (Movie detail / My Journal / Calendar) — ไว้ก่อน ----------
+   ---------------------------------------------------------------------- */
+
+
+
+/* หนังที่ดูในวันนั้น: โปสเตอร์เล็กกลางช่อง + ดาวใต้โปสเตอร์ (หลายเรื่อง = เรียงกันในแถว) */
+.cal-movies {
+    position: absolute;
+    top: 3px;                           /* โปสเตอร์สูงเต็มช่อง (เลขวันวางทับมุมซ้ายบน) */
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.cal-movie {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    text-decoration: none;
+}
+
+/* 2 เรื่อง: โปสเตอร์เล็กลงให้พอดีช่อง */
+.cal-movies-2 .cal-stars,
+.cal-movies-3 .cal-stars {
+    font-size: 5px;
+}
+
+/* 3 เรื่องขึ้นไป: ซ้อนกันเหมือนรูปวางทับ (เอาเมาส์ชี้ = ดึงขึ้นมาข้างหน้า) */
+.cal-movies-3 {
+    gap: 0;
+}
+
+.cal-movies-3 .cal-movie + .cal-movie {
+    margin-left: -9px;
+}
+
+.cal-movies-3 .cal-movie:hover {
+    z-index: 1;
+}
+
+.cal-poster {
+    display: block;
+    height: calc(100% - 8px);           /* เต็มช่อง เว้นที่ให้ดาวด้านล่าง */
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease;
+}
+
+.cal-movie:hover .cal-poster {
+    transform: scale(1.12);
+}
+
+.cal-poster-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #CDBFAE;
+    font-size: 5px;
+    text-align: center;
+    overflow: hidden;
+    color: #FFFFFF;
+}
+
+.cal-stars {
+    margin-top: 1px;
+    font-size: 6.5px;
+    letter-spacing: -0.3px;
+    line-height: 1;
+    color: #C99A2E;
+}
+
+/* ---------- ปฏิทินหนัง (/my-journal หน้าขวา) ----------
+   พื้น = calendar_right_page.png (Figma: Book → calendar_right_page, 828×1136 export 2x): เส้นตาราง 7×6, ชื่อวัน,
+   วงกลมปุ่ม ‹ ›, "MOVIE CALENDAR", ดาว — โค้ดวางแค่ชื่อเดือน/ปี/ช่องวันตามตำแหน่งใน Figma (--u = 1px ของ Figma) */
+.home-content:has(.movie-calendar) {
+    padding: 0;
+    overflow: hidden;
+}
+
+.movie-calendar {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+    color: #1E1A18;
+}
+
+.movie-calendar > *,
+.cal-body > * {
+    --u: calc(100cqw / 828);
+    position: absolute;
+}
+
+.cal-body {
+    inset: 0;
+}
+
+/* ชื่อเดือนตัวปั๊มนูนแบบ "SEARCH A MOVIE" (Cinzel สีกระดาษ + ไฮไลต์ขาวบนซ้าย + เงาล่างขวา) */
+.cal-heading {
+    left: calc(64 * var(--u));
+    top: calc(68 * var(--u));
+    font-family: "Cinzel", Georgia, serif;
+    font-size: calc(68 * var(--u));
+    letter-spacing: calc(4 * var(--u));
+    line-height: 1;
+    text-transform: uppercase;
+    color: #E6DCCB;
+    text-shadow: -1.2px -1.2px 0.8px rgba(255, 255, 255, 0.95),
+                 1.4px 1.8px 2.2px rgba(80, 60, 50, 0.45);
+}
+
+.cal-sub {
+    left: calc(60 * var(--u));
+    top: calc(184 * var(--u));
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: calc(26 * var(--u));
+    font-weight: 600;
+    letter-spacing: calc(1 * var(--u));
+    color: #B5525C;
+    text-shadow: -0.6px -0.6px 0 rgba(255, 255, 255, 0.85),
+                 0.8px 1.2px 1.2px rgba(90, 30, 40, 0.35);
+}
+
+/* ปุ่มใสทับวงกลมในรูป */
+.cal-nav {
+    top: calc(88 * var(--u));
+    width: calc(48 * var(--u));
+    height: calc(48 * var(--u));
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.cal-nav:hover {
+    background: rgba(30, 26, 24, 0.12);
+}
+
+.cal-nav-prev { left: calc(660 * var(--u)); }
+.cal-nav-next { left: calc(720 * var(--u)); }
+
+/* ช่องวัน 7×6 ตรงกับตารางในรูป (ใต้แถวชื่อวัน) */
+.cal-days {
+    left: calc(60 * var(--u));
+    top: calc(272 * var(--u));
+    width: calc(708 * var(--u));
+    height: calc(756 * var(--u));
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+}
+
+.cal-cell {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* เลขวันอยู่บนโปสเตอร์ (มุมซ้ายบน มีพื้นครีมให้อ่านออก) */
+.cal-num {
+    position: absolute;
+    top: calc(4 * var(--u));
+    left: calc(5 * var(--u));
+    z-index: 2;
+    padding: 0 calc(3 * var(--u));
+    font-family: "Space Mono", "Courier Prime", monospace;
+    font-size: calc(16 * var(--u));
+    line-height: 1.3;
+    color: #4A4440;
+}
+
+.cal-cell:has(.cal-movies) .cal-num {
+    border-radius: calc(4 * var(--u));
+    background: rgba(243, 235, 221, 0.88);
+}
+
+/* เลขวันเสาร์-อาทิตย์ สีชมพู */
+.cal-accent {
+    color: #B5525C;
+}
+
+/* วันนี้: วงกลมชมพูรอบเลขวัน */
+.cal-today .cal-num {
+    border: 1px solid #B5525C;
+    border-radius: 50%;
+}
+
+
+/* ---------- หน้ารายละเอียดหนัง (/movie/<id>) ----------
+   ซ้าย: ลิงก์กลับ + โปสเตอร์ + ปุ่มดูตัวอย่าง   ขวา: ข้อมูลหนังแบบฟอร์มบนกระดาษขาว */
+
+/* ลิงก์กลับหน้า Search (ตอนโหลดหนังไม่ได้) */
+.detail-back {
+    align-self: flex-start;
+    font-family: "Courier Prime", "Courier New", monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: #5C4436;
+    text-decoration: none;
+}
+
+.detail-back:hover {
+    text-decoration: underline;
+}
+
+/* ฝั่งซ้าย: movie_left_page.jpg (Figma: Book → movie_left_page_b, 808×1136 export 2x)
+   ทุกชิ้นวางแบบ absolute ตามตำแหน่งใน Figma: --u = 1px ของ Figma */
+.home-content-left:has(.mlp) {
+    padding: 0;
+    overflow: hidden;
+}
+
+.mlp {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+}
+
+.mlp > * {
+    --u: calc(100cqw / 808);
+}
+
+.mlp-back {
+    position: absolute;
+    left: calc(62 * var(--u));
+    top: calc(66 * var(--u));
+    font-family: "Courier Prime", "Courier New", monospace;
+    font-size: calc(22 * var(--u));
+    letter-spacing: calc(1 * var(--u));
+    color: #5C4436;
+    text-decoration: none;
+}
+
+.mlp-back:hover {
+    text-decoration: underline;
+}
+
+/* ชื่อหนังตัวปั๊มนูน: สีฟ้าอ่อนกว่าพื้น + ขอบสว่างซ้ายบน / เงาขวาล่าง */
+.mlp-title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(139 * var(--u));
+    height: calc(75 * var(--u));
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Cinzel", serif;
+    font-weight: 400;
+    font-size: calc(var(--fs) * var(--u));
+    letter-spacing: calc(3 * var(--u));
+    white-space: nowrap;
+    color: #C6DBF0;
+    text-shadow:
+        calc(-1.5 * var(--u)) calc(-1.5 * var(--u)) calc(1 * var(--u)) rgba(255, 255, 255, 0.9),
+        calc(2 * var(--u)) calc(2.5 * var(--u)) calc(2.5 * var(--u)) rgba(51, 77, 115, 0.45);
+}
+
+.mlp-poster {
+    position: absolute;
+    left: calc(204 * var(--u));
+    top: calc(272 * var(--u));
+    width: calc(400 * var(--u));
+    height: calc(600 * var(--u));
+    object-fit: cover;
+    border-radius: calc(4 * var(--u));
+    box-shadow: 0 calc(5 * var(--u)) calc(12 * var(--u)) rgba(38, 56, 89, 0.3);
+}
+
+.mlp-poster-empty {
+    background: #2A2420;
+}
+
+/* ซองพลาสติกทับโปสเตอร์ (รูปโปร่งใสจาก Figma) — กดทะลุได้ */
+.mlp-wrap {
+    position: absolute;
+    left: calc(169 * var(--u));
+    top: calc(222 * var(--u));
+    width: calc(470 * var(--u));
+    height: calc(700 * var(--u));
+    pointer-events: none;
+}
+
+/* ปุ่มดูตัวอย่าง: แคปซูลสีน้ำตาลเข้ม กลางหน้า */
+.mlp-trailer {
+    position: absolute;
+    left: 50%;
+    top: calc(945 * var(--u));
+    transform: translateX(-50%);
+    height: calc(45 * var(--u));
+    padding: 0 calc(29 * var(--u));
+    display: flex;
+    align-items: center;
+    border-radius: 999px;
+    background: #4A3B35;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: calc(18 * var(--u));
+    white-space: nowrap;
+    color: #F3EBDD;
+    text-decoration: none;
+}
+
+.mlp-trailer:hover {
+    background: #5C4436;
+}
+
+/* ปุ่ม "อยากดู" / "ดูแล้ว": กรอบเส้นสีน้ำตาล พื้นขาวโปร่ง */
+.detail-list-btns {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(1004 * var(--u));
+    display: flex;
+    justify-content: center;
+    gap: calc(12 * var(--u));
+}
+
+.detail-list-btn {
+    /* "Mark as watched" เป็นลิงก์ (<a>) ไม่ใช่ปุ่ม → จัดกล่องให้สูง/ตรงแนวเดียวกับปุ่ม Watchlist และไม่มีขีดเส้นใต้ */
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    text-decoration: none;
+    height: calc(35 * var(--u));
+    padding: 0 calc(20 * var(--u));
+    border: calc(1.5 * var(--u)) solid #4A3B35;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: calc(16 * var(--u));
+    white-space: nowrap;
+    color: #4A3B35;
+    cursor: pointer;
+}
+
+.detail-list-btn:hover:not(:disabled) {
+    background: #4A3B35;
+    color: #F3EBDD;
+}
+
+/* เพิ่มแล้ว: ปุ่มจาง กดซ้ำไม่ได้ */
+.detail-list-btn:disabled {
+    border-style: dashed;
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* ฝั่งขวา: movie_right_page.jpg (Figma: Book → movie_right_page_b, 828×1136 export 2x) ปูเต็มหน้า
+   ข้อมูลจาก TMDB วางแบบ absolute ตามตำแหน่งใน Figma: --u = 1px ของ Figma (ย่อ/ขยายตามความกว้างหน้า) */
+.home-content:has(.mrp) {
+    padding: 0;
+    overflow: hidden;
+    /* หน้าสมุดสีฟ้าหม่น ยังเห็นลายกระดาษ (สีเดียวกับกระดาษตอนพลิก .paper-blue) */
+    background: url("paper_texture.jpg") center / cover, #B4C4D1;
+    background-blend-mode: multiply;
+}
+
+.mrp {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+}
+
+.mrp > * {
+    --u: calc(100cqw / 828);
+}
+
+/* ข้อมูลลายมือสีน้ำเงิน (ฟอนต์เดียวกับใน Figma) */
+.mrp-val {
+    position: absolute;
+    left: calc(var(--x) * var(--u));
+    top: calc(var(--y) * var(--u));
+    width: calc(var(--w) * var(--u));
+    font-family: "Caveat Brush", cursive;
+    font-size: calc(var(--fs, 26) * var(--u));
+    line-height: calc(var(--lh, 33) * var(--u));
+    color: #294A99;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;            /* ยาวเกินช่อง → ตัดเป็น … */
+}
+
+.mrp-title    { --x: 213.7; --y: 225.8; --w: 340; --fs: 28; --lh: 35; }
+.mrp-year     { --x: 563.3; --y: 225.8; --w: 120; --fs: 28; --lh: 35; text-align: center; }
+.mrp-director { --x: 255.7; --y: 292.8; --w: 188; }
+.mrp-runtime  { --x: 563.7; --y: 292.8; --w: 115; }
+
+/* นักแสดง / เรื่องย่อ: หลายบรรทัด เกินแล้วตัดเป็น … */
+.mrp-starring,
+.mrp-synopsis {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+}
+
+.mrp-starring { --x: 256.7; --y: 358.8; --w: 410.6; --lh: 34; -webkit-line-clamp: 2; }
+.mrp-synopsis { --x: 152.7; --y: 498.8; --w: 514.6; --fs: 24; --lh: 38; -webkit-line-clamp: 11; }
+
+/* บรรทัดล่าง: แนวหนัง + ดาวคะแนน อยู่กลางกระดาษ */
+.mrp-genre    { --x: 136.7; --y: 941.2; --w: 546.6; text-align: center; }
+
+.mrp-stars {
+    margin-left: calc(10 * var(--u));
+    font-family: "Libre Caslon Text", serif;
+    font-size: calc(20 * var(--u));
+    color: #E0A31A;
+}
+
+
+/* My Journal ยังไม่มีบันทึก */
+.je-empty {
+    margin: auto;
+    font-family: "Caveat", cursive;
+    font-size: 18px;
+    color: #6B5E55;
+}
+
+/* ---------- หน้าคู่ My Journal (/my-journal): รีวิว 6 เรื่อง (Figma: Book → journal_spread) ----------
+   วางตามตำแหน่งใน Figma: --u = 1px ของ Figma (หน้าละ 828px), ตำแหน่งแต่ละช่องส่งมาจาก JOURNAL_SLOTS ใน app.py
+   ตัวไทยใช้ Mali (เบราว์เซอร์เลือกให้เองทีละตัวอักษร) */
+.home-content:has(.jr),
+.home-content-left:has(.jr) {
+    padding: 0;
+    overflow: clip;
+}
+
+.jr {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+    font-family: "Nothing You Could Do", "Mali", cursive;
+    color: #2B2826;
+}
+
+/* ลายมือหนาขึ้นนิดหน่อย (ฟอนต์มีแค่น้ำหนักเดียว → เพิ่มเส้นขอบสีเดียวกับตัวหนังสือ) */
+.jr-head,
+.jr .jr-review {
+    -webkit-text-stroke: calc(0.5 * var(--u)) currentColor;
+}
+
+.jr > * {
+    --u: calc(100cqw / 828);
+    position: absolute;
+    left: calc(var(--x) * var(--u));
+    top: calc(var(--y) * var(--u));
+    width: calc(var(--w) * var(--u));
+}
+
+.jr-head {
+    display: block;
+    font-size: calc(25 * var(--u));
+    line-height: calc(40 * var(--u));
+    white-space: pre-wrap;
+    color: #8A3B3B;
+    text-decoration: none;
+}
+
+.jr-movie {
+    display: inline-block;
+}
+
+/* ชื่อหนังขึ้นบรรทัดใหม่ → ไม่ต้องมีจุดคั่นหน้าชื่อ (และให้อยู่บรรทัดใหม่ต่อไป แม้ตัดจุดออกแล้วจะพอดีบรรทัดวันที่) */
+.jr-wrapped .jr-sep {
+    display: none;
+}
+
+.jr-wrapped .jr-movie {
+    display: block;
+}
+
+/* ดาว 5 ดวงกดให้คะแนนได้: ดวงที่เลือก + ดวงก่อนหน้า = ★ ทองทึบ, ที่เหลือ = ☆ ขอบทอง
+   (ซ่อนวงกลม radio ของ Dash แล้ววาดดาวเองด้วย ::before — Firefox/Chrome เหมือนกัน) */
+.jr-stars {
+    display: flex;
+    gap: calc(1 * var(--u));
+    height: calc(38 * var(--u));
+    align-items: center;
+}
+
+.jr-stars .dash-options-list-option-wrapper,
+.jr-stars .dash-options-list-option-text > span {
+    display: none !important;
+}
+
+.jr-stars .dash-options-list-option {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.jr-stars .dash-options-list-option-text::before {
+    content: "☆";
+    font-family: "Libre Caslon Text", serif;
+    font-size: calc(30 * var(--u));
+    line-height: 1;
+    color: #C99A3A;
+}
+
+.jr-stars .dash-options-list-option[aria-selected="true"] .dash-options-list-option-text::before,
+.jr-stars .dash-options-list-option:has(~ [aria-selected="true"]) .dash-options-list-option-text::before {
+    content: "★";
+}
+
+/* ครึ่งดาว (คะแนน .5): ดวงถัดจากดวงที่เลือก = ครึ่งซ้ายทอง + ขอบ ☆ ทับ */
+.jr-stars .dash-options-list-option-text {
+    position: relative;
+}
+
+.jr-half .dash-options-list-option[aria-selected="true"] + .dash-options-list-option .dash-options-list-option-text::before {
+    content: "★";
+    background: linear-gradient(90deg, #C99A3A 50%, transparent 50%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.jr-half .dash-options-list-option[aria-selected="true"] + .dash-options-list-option .dash-options-list-option-text::after {
+    content: "☆";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: "Libre Caslon Text", serif;
+    font-size: calc(30 * var(--u));
+    line-height: 1;
+    color: #C99A3A;
+}
+
+/* รีวิว: ช่องเขียนโปร่งใสลายมือ เหมือนเขียนลงกระดาษ สูง 5 บรรทัด (ยาวกว่านั้นเลื่อนในช่อง)
+   !important: ลบกรอบ/พื้นขาว/มุมลากขยายที่ Dash ใส่ให้ textarea (เห็นชัดใน Firefox ตอนคลิก) */
+.jr .jr-review,
+.jr .jr-review:hover,
+.jr .jr-review:focus,
+.jr .jr-review:focus-visible {
+    display: block;
+    width: 100%;
+    height: calc(5 * 38 * var(--u));
+    margin: calc(4 * var(--u)) 0 0;
+    padding: 0;
+    border: none !important;
+    border-radius: 0;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    resize: none !important;
+    scrollbar-width: none;
+    font-family: "Nothing You Could Do", "Mali", cursive;
+    font-size: calc(23 * var(--u));
+    line-height: calc(38 * var(--u));
+    color: #2B2826;
+}
+
+.jr-review::placeholder {
+    color: rgba(43, 40, 38, 0.35);
+}
+
+/* รูปฉากหนัง: ไม่มีขอบ เงาจาง เอียงตาม Figma + เทปครีมขอบบน */
+.jr-photo {
+    height: calc(var(--h) * var(--u));
+    transform: rotate(var(--r));
+    box-shadow: calc(1 * var(--u)) calc(3 * var(--u)) calc(5 * var(--u)) rgba(0, 0, 0, 0.18);
+}
+
+.jr-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* เทปกาว = journal_tape.png (Figma: Book → journal_tape) */
+.jr-photo::before {
+    content: "";
+    position: absolute;
+    top: calc(-16 * var(--u));
+    left: 50%;
+    width: calc(96 * var(--u));
+    height: calc(34 * var(--u));
+    background: url("journal_tape.png") 0 0 / 100% 100%;
+    transform: translateX(-50%) rotate(-4deg);
+}
+
+/* รูปฉากหนังในหน้า My Journal กดได้ (เปลี่ยนเป็นฉากที่ชอบ) */
+.jr-photo {
+    cursor: pointer;
+}
+
+.jr-photo:hover {
+    filter: brightness(1.06);
+}
+
+/* หน้าต่างเลือกฉากหนัง: กระดาษครีมกลางจอ + ภาพฉากเรียง 4 คอลัมน์ (เลื่อนดูได้) */
+.scene-sheet {
+    position: relative;
+    z-index: 1;
+    width: min(860px, 90vw);
+    max-height: 80vh;
+    padding: 22px 24px 26px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-radius: 4px;
+    background: url("paper_texture.jpg") center / cover, #F6F1E6;
+    background-blend-mode: multiply;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.id-modal.open .scene-sheet {
+    opacity: 1;
+    transform: none;
+}
+
+/* หัวข้อแบบ "TRENDING THIS WEEK" หน้า Search (.results-heading) */
+.scene-title {
+    margin-bottom: 14px;
+    font-family: "Work Sans", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #B5525C;
+}
+
+.scene-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.scene-thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.scene-thumb:hover {
+    transform: scale(1.04) rotate(-1deg);
+}
+
+/* ฉากที่ใช้อยู่ตอนนี้ */
+.scene-thumb-on {
+    outline: 3px solid #C99A3A;
+    outline-offset: 2px;
+}
+
+.scene-empty {
+    font-family: "Nothing You Could Do", "Mali", cursive;
+    color: #6B5E55;
+}
