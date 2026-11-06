@@ -1257,6 +1257,9 @@ def save_review(n_blur, review): # คลิกออกจากช่องร
         update_entry(ctx.triggered_id["index"], review=review or "", reviewed=True)   # reviewed → ขึ้นในปฏิทิน
 
 
-# รันแอป
+# ตัว Flask ที่อยู่ข้างใน Dash — บน Render ใช้รันด้วย gunicorn ("gunicorn app:server")
+server = app.server
+
+# รันแอปในเครื่อง (python app.py) — บน Render ไม่ได้รันบรรทัดนี้
 if __name__ == "__main__":
     app.run(debug=True)

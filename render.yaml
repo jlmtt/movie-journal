@@ -1,0 +1,18 @@
+# Render Blueprint: New → Blueprint → เลือก repo นี้ → Render อ่านไฟล์นี้แล้วสร้างเว็บให้
+services:
+  - type: web
+    name: movie-journal
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:server --workers 1 --threads 4 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      # ค่าลับ: กรอกเองในหน้า Environment ของ Render (ไม่อยู่ใน git)
+      - key: TMDB_API_KEY
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
+      - key: SECRET_MESSAGE
+        sync: false
