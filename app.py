@@ -1,4 +1,3 @@
-import calendar
 import json
 import os                       # อ่านค่าจาก .env + สลับไฟล์
 import threading                # Lock กันเขียนไฟล์ชนกัน
@@ -67,17 +66,19 @@ def tab_link(label, href, active): # แถบ 1 อัน (หน้าที�
 # ลำดับแถบ index
 TAB_ORDER = ["/journal", "/search", "/my-journal"]
 
-def journal_page_number(path): # "/my-journal/p2" → 2 (หน้าอื่น → None)
+def journal_page_number(path): # "/my-journal" → 1, "/my-journal/p2" → 2 (หน้าอื่น → None)
+    if path == "/my-journal":   # กดแถบ My Journal = หน้าคู่รีวิวแรก
+        return 1
     if path and path.startswith("/my-journal/p") and path.removeprefix("/my-journal/p").isdigit():
         return int(path.removeprefix("/my-journal/p")) or None
     return None
 
 
-def journal_page_path(n): # 2 → "/my-journal/p2"
-    return f"/my-journal/p{n}"
+def journal_page_path(n): # 1 → "/my-journal", 2 → "/my-journal/p2"
+    return "/my-journal" if n == 1 else f"/my-journal/p{n}"
 
 
-def page_order(path): # ลำดับหน้า: Home 0 → Search 1 → หน้าหนัง 1.5 → ปฏิทิน 2 → รีวิว 2.001, 2.002...
+def page_order(path): # ลำดับหน้า: Home 0 → Search 1 → หน้าหนัง 1.5 → รีวิว 2.001, 2.002... → Wishlist 2.9
     if path and path.startswith("/movie/"):   # หน้ารายละเอียดหนัง
         return 1.5
     n = journal_page_number(path)
@@ -94,12 +95,10 @@ def neighbor_pages(active): # (หน้าก่อนหน้า, หน้�
     n = journal_page_number(active)
     pages = journal_page_count()
     if n:   # หน้าคู่รีวิว (หน้าสุดท้าย → Wishlist)
-        return ("/my-journal" if n == 1 else journal_page_path(n - 1),
+        return ("/search" if n == 1 else journal_page_path(n - 1),
                 journal_page_path(n + 1) if n < pages else WISHLIST_PATH)
     if active == WISHLIST_PATH:   # Wishlist ← หน้าคู่รีวิวหน้าสุดท้าย
         return journal_page_path(pages), None
-    if active == "/my-journal":   # ปฏิทิน
-        return "/search", journal_page_path(1)
     if active not in TAB_ORDER:
         return None, None
     # แถบหลัก: ก่อนหน้า/ถัดไปตาม TAB_ORDER
@@ -571,8 +570,6 @@ def show_page(pathname, logged_in, last_page, last_query):
             return movie_layout(int(pathname.removeprefix("/movie/")), last_page), pathname
         if pathname == WISHLIST_PATH:
             return wishlist_layout(last_page), pathname
-        if pathname == "/my-journal":
-            return my_journal_layout(last_page), pathname
         if journal_page_number(pathname) and journal_page_number(pathname) <= journal_page_count():
             return journal_spread_layout(last_page, journal_page_number(pathname)), pathname
 
@@ -949,74 +946,8 @@ def tmdb_lookup(title):
 
 
 # ============================================================
-# My Journal (/my-journal = ปฏิทิน, /my-journal/p1.. = รีวิว)
+# My Journal (/my-journal, /my-journal/p2.. = รีวิว, /my-journal/wishlist)
 # ============================================================
-
-def calendar_month(year, month):
-    """เนื้อในปฏิทินของเดือนนั้น: ชื่อเดือน + ตารางวัน (วงกลมรอบวันนี้ เฉพาะเดือนปัจจุบัน)
-    วันที่ดูหนัง = โปสเตอร์เล็ก + ดาวใต้โปสเตอร์ กดแล้วไปหน้ารายละเอียดหนัง
-    แสดงเฉพาะเรื่องที่เขียนรีวิวด้วยโปสการ์ดแล้ว (มี "reviewed" — รายการเก่าที่ไม่มีโปสการ์ดไม่ขึ้น)"""
-    today = date.today()
-    watched = {}   # {วันที่: [หนังที่ดูวันนั้น]} เฉพาะเดือนนี้
-    for e in load_journal():
-        reviewed = e.get("reviewed") or "feel" in e   # "feel" = บันทึกจากโปสการ์ดก่อนมี flag reviewed
-        if reviewed and e.get("date", "").startswith(f"{year:04d}-{month:02d}"):
-            watched.setdefault(int(e["date"][8:10]), []).append(e)   # วันเดียวดูหลายเรื่อง → แสดงครบทุกเรื่อง
-
-    def movie_on(entry):
-        # หนัง 1 เรื่องในช่องวัน: โปสเตอร์ + ดาว
-        movie_id, poster = entry.get("tmdb_id"), entry.get("poster")
-        if not (movie_id and poster):   # บันทึกเก่าไม่มีข้อมูล → ค้นจากชื่อ
-            movie_id, poster = tmdb_lookup(entry["title"])[:2]
-        img = (html.Img(src=f"{TMDB_IMAGE}/w92{poster}", className="cal-poster") if poster
-               else html.Div(entry["title"], className="cal-poster cal-poster-empty"))
-        rating = int(entry.get("rating") or 0)   # คะแนนครึ่งดาว (3.5) → แสดงเต็มดวงแค่ 3
-        stars = html.Div("★" * rating + "☆" * (5 - rating), className="cal-stars")
-        body = [img, stars]
-        # ซีรีส์ (media = "tv") ไม่มีหน้ารายละเอียดหนัง → ไม่เป็นลิงก์
-        return (dcc.Link(body, href=f"/movie/{movie_id}", title=entry["title"], className="cal-movie")
-                if movie_id and entry.get("media", "movie") == "movie"
-                else html.Div(body, title=entry["title"], className="cal-movie"))
-
-    def day_cell(day, col):
-        # ช่องวัน 1 ช่อง (day = 0 → ช่องว่างนอกเดือน)
-        if day == 0:
-            return html.Div(className="cal-cell cal-empty")
-        accent = " cal-accent" if col in (0, 6) else ""   # วันเสาร์-อาทิตย์ เลขสีแดง
-        is_today = (year, month, day) == (today.year, today.month, today.day)
-        movies = watched.get(day, [])
-        return html.Div([html.Span(f"{day:02d}", className="cal-num" + accent),
-                         # หลายเรื่อง: โปสเตอร์เรียงกันกลางช่อง (เล็กลง / 3 เรื่องขึ้นไปซ้อนกันนิด ๆ)
-                         html.Div([movie_on(e) for e in movies],
-                                  className="cal-movies" + (f" cal-movies-{min(len(movies), 3)}" if len(movies) > 1 else ""))
-                         if movies else None],
-                        className="cal-cell" + (" cal-today" if is_today else ""))
-
-    weeks = calendar.Calendar(firstweekday=6).monthdayscalendar(year, month)   # เริ่มวันอาทิตย์
-    weeks += [[0] * 7] * (6 - len(weeks))   # ตารางในรูปมี 6 แถวเสมอ → เดือนที่มี 4–5 สัปดาห์ เติมแถวว่าง
-    return [
-        # ชื่อเดือนตัวปั๊มนูนแบบ "SEARCH A MOVIE" หน้า Search + หัวข้อชมพูแบบ "TRENDING THIS WEEK"
-        html.Div(date(year, month, 1).strftime("%B"), className="cal-heading"),
-        html.Div(f"{year} ·", className="cal-sub"),   # " MOVIE CALENDAR" อยู่ในรูปต่อท้าย
-        # ช่องวัน 7×6 วางตรงตารางในรูป (เส้นตาราง + แถว SUN–SAT อยู่ในรูปแล้ว)
-        html.Div([day_cell(d, i) for week in weeks for i, d in enumerate(week)], className="cal-days"),
-    ]
-
-
-def movie_calendar():
-    """ปฏิทินแบบแพลนเนอร์ (หน้า 9) เปิดมาเป็นเดือนปัจจุบัน
-    ปุ่ม ‹ › ข้างชื่อเดือนใช้เปลี่ยนเดือน (callback change_month) — ตอนนี้เป็นปฏิทินเปล่า มีแค่เลขวัน"""
-    today = date.today()
-    return html.Div([
-        # ดาวเส้นฟ้าประดับมุม (แบบหน้า Search)
-        # เส้นตาราง ชื่อวัน วงกลมปุ่ม ‹ › "MOVIE CALENDAR" และดาว = รูปเดียวจาก Figma (Book → calendar_right_page)
-        html.Img(src=app.get_asset_url("calendar_right_page.png"), className="search-page-art"),
-        dcc.Store(id="cal-month", data=[today.year, today.month]),   # เดือนที่แสดงอยู่ [ปี, เดือน]
-        html.Button(id="cal-prev", title="Previous month", className="cal-nav cal-nav-prev"),   # ปุ่มใสทับวงกลมในรูป
-        html.Button(id="cal-next", title="Next month", className="cal-nav cal-nav-next"),
-        html.Div(calendar_month(today.year, today.month), id="cal-body", className="cal-body"),
-    ], className="movie-calendar")
-
 
 # ตำแหน่งรีวิว 6 ช่องตาม Figma (Book → journal_spread, หน้าละ 828px): (ซ้าย/บน/กว้าง ของตัวหนังสือ), (ซ้าย/บน/กว้าง/สูง/เอียง ของรูป)
 JOURNAL_SLOTS = [
@@ -1140,35 +1071,10 @@ def wishlist_layout(last):
                 left=[side("wishlist_left_page.jpg", "wishlist_vellum_left.png", posters[:5])], last=last)
 
 
-def my_journal_layout(last):
-    """หน้าแรกของ My Journal (/my-journal): หน้าซ้ายว่าง หน้าขวาเป็นปฏิทินดูหนัง"""
-    return page("/my-journal", movie_calendar(), left=[], last=last)
 
 
 
 # Callbacks: หน้ารายละเอียดหนัง + My Journal
-
-# ปฏิทินหน้า My Journal: ปุ่ม ‹ › เปลี่ยนเดือน
-@app.callback(
-    Output("cal-body", "children"),   # ตารางวันเดือนใหม่
-    Output("cal-month", "data"),      # จำเดือนที่แสดง
-    Input("cal-prev", "n_clicks"),    # ‹
-    Input("cal-next", "n_clicks"),    # ›
-    State("cal-month", "data"),       # [ปี, เดือน] ตอนนี้
-    prevent_initial_call=True,
-)
-def change_month(prev_clicks, next_clicks, shown):
-    """ถอย/เดินหน้า 1 เดือนจากเดือนที่แสดงอยู่ แล้ววาดปฏิทินใหม่"""
-    year, month = shown
-    # ctx.triggered_id = id ของปุ่มที่ถูกกด → ‹ ถอย 1 เดือน, › เดินหน้า 1 เดือน
-    month += -1 if ctx.triggered_id == "cal-prev" else 1
-    # ข้ามปี
-    if month == 0:
-        year, month = year - 1, 12
-    elif month == 13:
-        year, month = year + 1, 1
-    return calendar_month(year, month), [year, month]
-
 
 # หน้ารายละเอียดหนัง: เพิ่มเข้า "อยากดู"
 @app.callback(
