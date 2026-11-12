@@ -83,6 +83,8 @@ def page_order(path): # ลำดับหน้า: Home 0 → Search 1 → ห
     n = journal_page_number(path)
     if n:   # หน้าคู่รีวิว
         return 2 + n / 1000
+    if path == WISHLIST_PATH:   # Wishlist อยู่ท้ายสุดของ My Journal (ต่อจากหน้าคู่รีวิว)
+        return 2.9
     return TAB_ORDER.index(path) if path in TAB_ORDER else None
 
 
@@ -91,9 +93,11 @@ def neighbor_pages(active): # (หน้าก่อนหน้า, หน้�
         return "/search", "/my-journal"
     n = journal_page_number(active)
     pages = journal_page_count()
-    if n:   # หน้าคู่รีวิว
+    if n:   # หน้าคู่รีวิว (หน้าสุดท้าย → Wishlist)
         return ("/my-journal" if n == 1 else journal_page_path(n - 1),
-                journal_page_path(n + 1) if n < pages else None)
+                journal_page_path(n + 1) if n < pages else WISHLIST_PATH)
+    if active == WISHLIST_PATH:   # Wishlist ← หน้าคู่รีวิวหน้าสุดท้าย
+        return journal_page_path(pages), None
     if active == "/my-journal":   # ปฏิทิน
         return "/search", journal_page_path(1)
     if active not in TAB_ORDER:
@@ -164,6 +168,10 @@ def page(active, *content, left=None, last=None, overlay=None): # โครง�
                 ], className="page-turn-right") if turn_back else None,
                 # หมุดดาวมุมซ้ายล่าง → หน้าก่อนหน้า (เฉพาะหน้าที่มีกระดาษซ้าย)
                 page_pin(prev_page, "prev") if left is not None else None,
+                # หน้า Home: ด้านในปกซ้ายมีช่องเสียบการ์ด (รูป cover_slots_left.png จาก Figma: Book → cover_slots_left)
+                # บัตร MOVIE LOVER CLUB เสียบในช่องล่าง — กล่อง .id-slot ตัดส่วนที่อยู่ใต้ช่องออก เหมือนเสียบลงไปในปก
+                html.Div(id_card(profile, after_turn=turn_back), className="id-slot") if active == "/journal" else None,
+                html.Img(src=app.get_asset_url("cover_slots_left.png"), className="cover-slots") if active == "/journal" else None,
             ], className=cover_class),
             # ---- กระดาษขวา ----
             html.Div([
@@ -178,10 +186,9 @@ def page(active, *content, left=None, last=None, overlay=None): # โครง�
                 # หมุดดาวมุมขวาล่าง → หน้าถัดไป
                 page_pin(next_page, "next"),
                 # หน้า Home: 3 แผ่นวางซ้อนแบบคอลลาจ (ไม่มีซองแล้ว)
-                # ล่างสุด = กระดาษ This or That เต็มหน้า, ทับขวาบน = โปสการ์ดหนัง, ทับล่างกลาง = บัตร MOVIE LOVER CLUB
+                # ล่างสุด = กระดาษ This or That เต็มหน้า, ทับขวาบน = โปสการ์ดหนัง (บัตร MOVIE LOVER CLUB อยู่ในช่องปกซ้าย)
                 this_or_that_preview(profile, after_turn=turn_back) if active == "/journal" else None,
                 movie_postcard(profile, after_turn=turn_back) if active == "/journal" else None,
-                id_card(profile, after_turn=turn_back) if active == "/journal" else None,
                 # หน้ากระดาษที่กำลังพลิกไปซ้าย: ด้านหน้า = หน้าขวาของหน้าก่อนหน้า
                 # พลิกข้ามสันไปซ้าย → ด้านหลังกลายเป็นกระดาษซ้ายของหน้าใหม่
                 html.Div([
@@ -562,6 +569,8 @@ def show_page(pathname, logged_in, last_page, last_query):
             return search_layout(last_page, last_query), pathname
         if pathname and pathname.startswith("/movie/") and pathname.removeprefix("/movie/").isdigit():
             return movie_layout(int(pathname.removeprefix("/movie/")), last_page), pathname
+        if pathname == WISHLIST_PATH:
+            return wishlist_layout(last_page), pathname
         if pathname == "/my-journal":
             return my_journal_layout(last_page), pathname
         if journal_page_number(pathname) and journal_page_number(pathname) <= journal_page_count():
@@ -1090,6 +1099,45 @@ def journal_spread_layout(last, n=1):
                     ], className="scene-sheet"),
                     dcc.Store(id="scene-key"),
                 ], id="scene-modal", className="id-modal"))
+
+
+# ---------- Wishlist (/my-journal/wishlist): หนังที่อยากดู 10 เรื่องล่าสุด (หน้าละ 5) ----------
+# พื้นทั้งหน้า = wishlist_left/right_page.jpg, แผ่นกระดาษไขทับโปสเตอร์ = wishlist_vellum_left/right.png
+# (Figma: Book → wishlist_spread) โค้ดวางแค่โปสเตอร์ตามช่องใน Figma
+WISHLIST_PATH = "/my-journal/wishlist"
+WISHLIST_MAX = 10
+# ช่องโปสเตอร์ (ซ้าย, บน, กว้าง, สูง) หน่วย px ของ Figma ในหน้านั้น ๆ (หน้ากว้าง 828) — ช่อง 1–5 หน้าซ้าย, 6–10 หน้าขวา
+WISHLIST_SLOTS = [
+    (90, 200, 200, 285), (330, 160, 190, 270), (560, 230, 200, 285), (110, 690, 210, 300), (520, 700, 200, 285),
+    (72, 160, 200, 285), (322, 190, 190, 270), (562, 150, 210, 300), (102, 650, 200, 285), (382, 630, 190, 270),
+]
+
+
+def wishlist_poster(item, slot):
+    """โปสเตอร์ 1 เรื่องในช่องของ Wishlist (กดแล้วไปหน้ารายละเอียดหนัง) — ยังไม่เก็บโปสเตอร์ไว้ → ค้นจากชื่อใน TMDB"""
+    movie_id, poster = item.get("tmdb_id"), item.get("poster")
+    if not (movie_id and poster):
+        movie_id, poster = tmdb_lookup(item["title"])[:2]
+    x, y, w, h = WISHLIST_SLOTS[slot]
+    img = html.Img(src=f"{TMDB_IMAGE}/w342{poster}", className="wl-poster", title=item["title"],
+                   style={"--x": x, "--y": y, "--w": w, "--h": h}) if poster else None
+    return dcc.Link(img, href=f"/movie/{movie_id}") if img is not None and movie_id else img
+
+
+def wishlist_layout(last):
+    """Wishlist กางสองหน้า: เรื่องที่ 1–5 หน้าซ้าย, 6–10 หน้าขวา (เรียงตามลำดับที่กด + Watchlist)"""
+    items = load_watchlist()[-WISHLIST_MAX:]
+    posters = [wishlist_poster(item, i) for i, item in enumerate(items)]
+
+    def side(art, vellum, cards):
+        return html.Div([
+            html.Img(src=app.get_asset_url(art), className="search-page-art"),
+            *cards,
+            html.Img(src=app.get_asset_url(vellum), className="search-page-art wl-vellum"),   # กระดาษไขทับโปสเตอร์
+        ], className="wl")
+
+    return page(WISHLIST_PATH, side("wishlist_right_page.jpg", "wishlist_vellum_right.png", posters[5:]),
+                left=[side("wishlist_left_page.jpg", "wishlist_vellum_left.png", posters[:5])], last=last)
 
 
 def my_journal_layout(last):
