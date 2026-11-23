@@ -66,26 +66,24 @@ def tab_link(label, href, active): # แถบ 1 อัน (หน้าที�
 # ลำดับแถบ index
 TAB_ORDER = ["/journal", "/search", "/my-journal"]
 
-def journal_page_number(path): # "/my-journal" → 1, "/my-journal/p2" → 2 (หน้าอื่น → None)
-    if path == "/my-journal":   # กดแถบ My Journal = หน้าคู่รีวิวแรก
-        return 1
+def journal_page_number(path): # "/my-journal/p1" → 1, "/my-journal/p2" → 2 (หน้าอื่น → None)
     if path and path.startswith("/my-journal/p") and path.removeprefix("/my-journal/p").isdigit():
         return int(path.removeprefix("/my-journal/p")) or None
     return None
 
 
-def journal_page_path(n): # 1 → "/my-journal", 2 → "/my-journal/p2"
-    return "/my-journal" if n == 1 else f"/my-journal/p{n}"
+def journal_page_path(n): # 1 → "/my-journal/p1", 2 → "/my-journal/p2"
+    return f"/my-journal/p{n}"
 
 
-def page_order(path): # ลำดับหน้า: Home 0 → Search 1 → หน้าหนัง 1.5 → รีวิว 2.001, 2.002... → Wishlist 2.9
+def page_order(path): # ลำดับหน้า: Home 0 → Search 1 → หน้าหนัง 1.5 → Wishlist 2 → รีวิว 2.001, 2.002...
     if path and path.startswith("/movie/"):   # หน้ารายละเอียดหนัง
         return 1.5
     n = journal_page_number(path)
     if n:   # หน้าคู่รีวิว
         return 2 + n / 1000
-    if path == WISHLIST_PATH:   # Wishlist อยู่ท้ายสุดของ My Journal (ต่อจากหน้าคู่รีวิว)
-        return 2.9
+    if path == WISHLIST_PATH:   # Wishlist = หน้าแรกของ My Journal (ก่อนหน้าคู่รีวิว)
+        return 2
     return TAB_ORDER.index(path) if path in TAB_ORDER else None
 
 
@@ -94,11 +92,11 @@ def neighbor_pages(active): # (หน้าก่อนหน้า, หน้�
         return "/search", "/my-journal"
     n = journal_page_number(active)
     pages = journal_page_count()
-    if n:   # หน้าคู่รีวิว (หน้าสุดท้าย → Wishlist)
-        return ("/search" if n == 1 else journal_page_path(n - 1),
-                journal_page_path(n + 1) if n < pages else WISHLIST_PATH)
-    if active == WISHLIST_PATH:   # Wishlist ← หน้าคู่รีวิวหน้าสุดท้าย
-        return journal_page_path(pages), None
+    if n:   # หน้าคู่รีวิว (หน้าแรก ← Wishlist)
+        return (WISHLIST_PATH if n == 1 else journal_page_path(n - 1),
+                journal_page_path(n + 1) if n < pages else None)
+    if active == WISHLIST_PATH:   # Wishlist: Search ← Wishlist → หน้าคู่รีวิวแรก
+        return "/search", journal_page_path(1)
     if active not in TAB_ORDER:
         return None, None
     # แถบหลัก: ก่อนหน้า/ถัดไปตาม TAB_ORDER
@@ -946,7 +944,7 @@ def tmdb_lookup(title):
 
 
 # ============================================================
-# My Journal (/my-journal, /my-journal/p2.. = รีวิว, /my-journal/wishlist)
+# My Journal (/my-journal = Wishlist, /my-journal/p1, p2.. = รีวิว)
 # ============================================================
 
 # ตำแหน่งรีวิว 6 ช่องตาม Figma (Book → journal_spread, หน้าละ 828px): (ซ้าย/บน/กว้าง ของตัวหนังสือ), (ซ้าย/บน/กว้าง/สูง/เอียง ของรูป)
@@ -1032,73 +1030,45 @@ def journal_spread_layout(last, n=1):
                 ], id="scene-modal", className="id-modal"))
 
 
-# ---------- Wishlist (/my-journal/wishlist): หนังที่อยากดู 11 เรื่องล่าสุด ----------
-# หน้าซ้าย = ตะกร้า 6 เรื่อง (พื้น wishlist_basket_page.jpg จาก Figma: Book → wishlist_basket_page)
+# ---------- Wishlist (/my-journal = หน้าแรกของ My Journal): หนังที่อยากดู 6 เรื่องล่าสุด ----------
+# หน้าซ้าย = ตะกร้า (พื้น wishlist_basket_page.jpg จาก Figma: Book → wishlist_basket_page)
 #   โค้ดวางโปสเตอร์เอียงบนตะกร้า + วงกลมเลข 01–06 + คำบรรยายรายชื่อด้านล่าง
-# หน้าขวา = แบบกระดาษไข 5 เรื่องถัดไป (wishlist_right_page.jpg + wishlist_vellum_right.png จาก Book → wishlist_spread)
-WISHLIST_PATH = "/my-journal/wishlist"
-BASKET_MAX = 6
-WISHLIST_MAX = BASKET_MAX + 5
+# หน้าขวา = ว่างไว้ก่อน
+WISHLIST_PATH = "/my-journal"
+WISHLIST_MAX = 6
 # โปสเตอร์บนตะกร้า (ซ้าย, บน, กว้าง, สูง, องศาหมุนแบบ Figma) — x,y = มุมบนซ้ายของโปสเตอร์หลังหมุน (หน้ากว้าง 828)
 BASKET_SLOTS = [
     (144.3, 523.2, 143.5, 208.1, -8), (342.7, 509.7, 143.5, 208.1, 6), (541.2, 527.7, 143.5, 208.1, 11),
     (166.9, 708.1, 143.5, 208.1, 9), (360.8, 717.2, 143.5, 208.1, -5), (550.2, 703.6, 143.5, 208.1, -11),
 ]
 BASKET_NUMBERS = [(268, 529.4), (467, 480.9), (663.6, 486.5), (290.1, 671.9), (485.3, 715.8), (672.6, 717.2)]   # วงกลมเลข (ซ้าย, บน)
-# ช่องโปสเตอร์หน้าขวาแบบกระดาษไข (ซ้าย, บน, กว้าง, สูง)
-WISHLIST_SLOTS = [(72, 160, 200, 285), (322, 190, 190, 270), (562, 150, 210, 300), (102, 650, 200, 285), (382, 630, 190, 270)]
-
-
-def wishlist_movie(item):
-    """(tmdb_id, poster) ของหนัง — ยังไม่เก็บโปสเตอร์ไว้ → ค้นจากชื่อใน TMDB"""
-    movie_id, poster = item.get("tmdb_id"), item.get("poster")
-    if not (movie_id and poster):
-        movie_id, poster = tmdb_lookup(item["title"])[:2]
-    return movie_id, poster
-
-
-def link_to_movie(child, movie_id):
-    return dcc.Link(child, href=f"/movie/{movie_id}") if movie_id else child
-
-
-def wishlist_poster(item, slot):
-    """โปสเตอร์ 1 เรื่องในช่องหน้ากระดาษไข (กดแล้วไปหน้ารายละเอียดหนัง)"""
-    movie_id, poster = wishlist_movie(item)
-    if not poster:
-        return None
-    x, y, w, h = WISHLIST_SLOTS[slot]
-    return link_to_movie(html.Img(src=f"{TMDB_IMAGE}/w342{poster}", className="wl-poster", title=item["title"],
-                                  style={"--x": x, "--y": y, "--w": w, "--h": h}), movie_id)
 
 
 def basket_poster(item, slot):
-    """โปสเตอร์เอียงบนตะกร้า + วงกลมเลข"""
-    movie_id, poster = wishlist_movie(item)
+    """โปสเตอร์เอียงบนตะกร้า + วงกลมเลข (กดโปสเตอร์แล้วไปหน้ารายละเอียดหนัง)
+    ยังไม่เก็บโปสเตอร์ไว้ → ค้นจากชื่อใน TMDB"""
+    movie_id, poster = item.get("tmdb_id"), item.get("poster")
+    if not (movie_id and poster):
+        movie_id, poster = tmdb_lookup(item["title"])[:2]
     x, y, w, h, rot = BASKET_SLOTS[slot]
     nx, ny = BASKET_NUMBERS[slot]
     img = html.Img(src=f"{TMDB_IMAGE}/w342{poster}", className="wb-poster", title=item["title"],
                    style={"--x": x, "--y": y, "--w": w, "--h": h, "--r": f"{-rot}deg"}) if poster else None
-    num = html.Div(f"{slot + 1:02d}", className="wb-num", style={"--x": nx, "--y": ny})
-    return [link_to_movie(img, movie_id) if img is not None else None, num]
+    if img is not None and movie_id:
+        img = dcc.Link(img, href=f"/movie/{movie_id}")
+    return [img, html.Div(f"{slot + 1:02d}", className="wb-num", style={"--x": nx, "--y": ny})]
 
 
 def wishlist_layout(last):
-    """Wishlist: ซ้าย = ตะกร้า 6 เรื่องแรก, ขวา = กระดาษไข 5 เรื่องถัดไป (เรียงตามลำดับที่กด + Watchlist)"""
+    """Wishlist: ซ้าย = ตะกร้า 6 เรื่อง (เรียงตามลำดับที่กด + Watchlist), ขวา = ว่าง"""
     items = load_watchlist()[-WISHLIST_MAX:]
-    basket, rest = items[:BASKET_MAX], items[BASKET_MAX:]
-    caption = "; ".join(f"{i + 1:02d}: {item['title']}" for i, item in enumerate(basket))
-
+    caption = "; ".join(f"{i + 1:02d}: {item['title']}" for i, item in enumerate(items))
     left = html.Div([
         html.Img(src=app.get_asset_url("wishlist_basket_page.jpg"), className="search-page-art"),
-        *sum((basket_poster(item, i) for i, item in enumerate(basket)), []),
+        *sum((basket_poster(item, i) for i, item in enumerate(items)), []),
         html.P(caption, className="wb-caption") if caption else None,
     ], className="wl")
-    right = html.Div([
-        html.Img(src=app.get_asset_url("wishlist_right_page.jpg"), className="search-page-art"),
-        *[wishlist_poster(item, i) for i, item in enumerate(rest)],
-        html.Img(src=app.get_asset_url("wishlist_vellum_right.png"), className="search-page-art wl-vellum"),   # กระดาษไขทับโปสเตอร์
-    ], className="wl")
-    return page(WISHLIST_PATH, right, left=[left], last=last)
+    return page(WISHLIST_PATH, left=[left], last=last)
 
 
 

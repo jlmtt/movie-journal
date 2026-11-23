@@ -1854,8 +1854,7 @@ div.id-card-input {
     color: #6B5E55;
 }
 
-/* ---------- Wishlist (/my-journal/wishlist) ----------
-   พื้น + กระดาษไข = รูปจาก Figma (Book → wishlist_spread) โปสเตอร์วางตามช่อง (--x/--y/--w/--h = px ของ Figma) */
+/* ---------- Wishlist (/my-journal = หน้าแรกของ My Journal) ---------- */
 .home-content:has(.wl),
 .home-content-left:has(.wl) {
     padding: 0;
@@ -1868,26 +1867,6 @@ div.id-card-input {
     container-type: inline-size;
 }
 
-.wl-poster {
-    --u: calc(100cqw / 828);
-    position: absolute;
-    left: calc(var(--x) * var(--u));
-    top: calc(var(--y) * var(--u));
-    width: calc(var(--w) * var(--u));
-    height: calc(var(--h) * var(--u));
-    object-fit: cover;
-    filter: saturate(0.35) brightness(1.08) contrast(0.85);   /* ซีดแบบในรูป Figma */
-    transition: filter 0.2s ease;
-}
-
-/* ชี้โปสเตอร์ → สีกลับมา (กระดาษไขด้านบนไม่รับเมาส์) */
-.wl-poster:hover {
-    filter: none;
-}
-
-.wl-vellum {
-    z-index: 1;
-}
 
 
 /* ---------- Wishlist หน้าซ้าย: ตะกร้า (Figma: Book → wishlist_basket_page) ----------
