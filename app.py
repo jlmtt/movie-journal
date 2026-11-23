@@ -1032,43 +1032,73 @@ def journal_spread_layout(last, n=1):
                 ], id="scene-modal", className="id-modal"))
 
 
-# ---------- Wishlist (/my-journal/wishlist): หนังที่อยากดู 10 เรื่องล่าสุด (หน้าละ 5) ----------
-# พื้นทั้งหน้า = wishlist_left/right_page.jpg, แผ่นกระดาษไขทับโปสเตอร์ = wishlist_vellum_left/right.png
-# (Figma: Book → wishlist_spread) โค้ดวางแค่โปสเตอร์ตามช่องใน Figma
+# ---------- Wishlist (/my-journal/wishlist): หนังที่อยากดู 11 เรื่องล่าสุด ----------
+# หน้าซ้าย = ตะกร้า 6 เรื่อง (พื้น wishlist_basket_page.jpg จาก Figma: Book → wishlist_basket_page)
+#   โค้ดวางโปสเตอร์เอียงบนตะกร้า + วงกลมเลข 01–06 + คำบรรยายรายชื่อด้านล่าง
+# หน้าขวา = แบบกระดาษไข 5 เรื่องถัดไป (wishlist_right_page.jpg + wishlist_vellum_right.png จาก Book → wishlist_spread)
 WISHLIST_PATH = "/my-journal/wishlist"
-WISHLIST_MAX = 10
-# ช่องโปสเตอร์ (ซ้าย, บน, กว้าง, สูง) หน่วย px ของ Figma ในหน้านั้น ๆ (หน้ากว้าง 828) — ช่อง 1–5 หน้าซ้าย, 6–10 หน้าขวา
-WISHLIST_SLOTS = [
-    (90, 200, 200, 285), (330, 160, 190, 270), (560, 230, 200, 285), (110, 690, 210, 300), (520, 700, 200, 285),
-    (72, 160, 200, 285), (322, 190, 190, 270), (562, 150, 210, 300), (102, 650, 200, 285), (382, 630, 190, 270),
+BASKET_MAX = 6
+WISHLIST_MAX = BASKET_MAX + 5
+# โปสเตอร์บนตะกร้า (ซ้าย, บน, กว้าง, สูง, องศาหมุนแบบ Figma) — x,y = มุมบนซ้ายของโปสเตอร์หลังหมุน (หน้ากว้าง 828)
+BASKET_SLOTS = [
+    (144.3, 523.2, 143.5, 208.1, -8), (342.7, 509.7, 143.5, 208.1, 6), (541.2, 527.7, 143.5, 208.1, 11),
+    (166.9, 708.1, 143.5, 208.1, 9), (360.8, 717.2, 143.5, 208.1, -5), (550.2, 703.6, 143.5, 208.1, -11),
 ]
+BASKET_NUMBERS = [(268, 529.4), (467, 480.9), (663.6, 486.5), (290.1, 671.9), (485.3, 715.8), (672.6, 717.2)]   # วงกลมเลข (ซ้าย, บน)
+# ช่องโปสเตอร์หน้าขวาแบบกระดาษไข (ซ้าย, บน, กว้าง, สูง)
+WISHLIST_SLOTS = [(72, 160, 200, 285), (322, 190, 190, 270), (562, 150, 210, 300), (102, 650, 200, 285), (382, 630, 190, 270)]
 
 
-def wishlist_poster(item, slot):
-    """โปสเตอร์ 1 เรื่องในช่องของ Wishlist (กดแล้วไปหน้ารายละเอียดหนัง) — ยังไม่เก็บโปสเตอร์ไว้ → ค้นจากชื่อใน TMDB"""
+def wishlist_movie(item):
+    """(tmdb_id, poster) ของหนัง — ยังไม่เก็บโปสเตอร์ไว้ → ค้นจากชื่อใน TMDB"""
     movie_id, poster = item.get("tmdb_id"), item.get("poster")
     if not (movie_id and poster):
         movie_id, poster = tmdb_lookup(item["title"])[:2]
+    return movie_id, poster
+
+
+def link_to_movie(child, movie_id):
+    return dcc.Link(child, href=f"/movie/{movie_id}") if movie_id else child
+
+
+def wishlist_poster(item, slot):
+    """โปสเตอร์ 1 เรื่องในช่องหน้ากระดาษไข (กดแล้วไปหน้ารายละเอียดหนัง)"""
+    movie_id, poster = wishlist_movie(item)
+    if not poster:
+        return None
     x, y, w, h = WISHLIST_SLOTS[slot]
-    img = html.Img(src=f"{TMDB_IMAGE}/w342{poster}", className="wl-poster", title=item["title"],
-                   style={"--x": x, "--y": y, "--w": w, "--h": h}) if poster else None
-    return dcc.Link(img, href=f"/movie/{movie_id}") if img is not None and movie_id else img
+    return link_to_movie(html.Img(src=f"{TMDB_IMAGE}/w342{poster}", className="wl-poster", title=item["title"],
+                                  style={"--x": x, "--y": y, "--w": w, "--h": h}), movie_id)
+
+
+def basket_poster(item, slot):
+    """โปสเตอร์เอียงบนตะกร้า + วงกลมเลข"""
+    movie_id, poster = wishlist_movie(item)
+    x, y, w, h, rot = BASKET_SLOTS[slot]
+    nx, ny = BASKET_NUMBERS[slot]
+    img = html.Img(src=f"{TMDB_IMAGE}/w342{poster}", className="wb-poster", title=item["title"],
+                   style={"--x": x, "--y": y, "--w": w, "--h": h, "--r": f"{-rot}deg"}) if poster else None
+    num = html.Div(f"{slot + 1:02d}", className="wb-num", style={"--x": nx, "--y": ny})
+    return [link_to_movie(img, movie_id) if img is not None else None, num]
 
 
 def wishlist_layout(last):
-    """Wishlist กางสองหน้า: เรื่องที่ 1–5 หน้าซ้าย, 6–10 หน้าขวา (เรียงตามลำดับที่กด + Watchlist)"""
+    """Wishlist: ซ้าย = ตะกร้า 6 เรื่องแรก, ขวา = กระดาษไข 5 เรื่องถัดไป (เรียงตามลำดับที่กด + Watchlist)"""
     items = load_watchlist()[-WISHLIST_MAX:]
-    posters = [wishlist_poster(item, i) for i, item in enumerate(items)]
+    basket, rest = items[:BASKET_MAX], items[BASKET_MAX:]
+    caption = "; ".join(f"{i + 1:02d}: {item['title']}" for i, item in enumerate(basket))
 
-    def side(art, vellum, cards):
-        return html.Div([
-            html.Img(src=app.get_asset_url(art), className="search-page-art"),
-            *cards,
-            html.Img(src=app.get_asset_url(vellum), className="search-page-art wl-vellum"),   # กระดาษไขทับโปสเตอร์
-        ], className="wl")
-
-    return page(WISHLIST_PATH, side("wishlist_right_page.jpg", "wishlist_vellum_right.png", posters[5:]),
-                left=[side("wishlist_left_page.jpg", "wishlist_vellum_left.png", posters[:5])], last=last)
+    left = html.Div([
+        html.Img(src=app.get_asset_url("wishlist_basket_page.jpg"), className="search-page-art"),
+        *sum((basket_poster(item, i) for i, item in enumerate(basket)), []),
+        html.P(caption, className="wb-caption") if caption else None,
+    ], className="wl")
+    right = html.Div([
+        html.Img(src=app.get_asset_url("wishlist_right_page.jpg"), className="search-page-art"),
+        *[wishlist_poster(item, i) for i, item in enumerate(rest)],
+        html.Img(src=app.get_asset_url("wishlist_vellum_right.png"), className="search-page-art wl-vellum"),   # กระดาษไขทับโปสเตอร์
+    ], className="wl")
+    return page(WISHLIST_PATH, right, left=[left], last=last)
 
 
 

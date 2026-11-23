@@ -1889,3 +1889,55 @@ div.id-card-input {
     z-index: 1;
 }
 
+
+/* ---------- Wishlist หน้าซ้าย: ตะกร้า (Figma: Book → wishlist_basket_page) ----------
+   พื้น = wishlist_basket_page.jpg, โปสเตอร์/เลข/คำบรรยายวางด้วยโค้ด (ตัวเลข = px ของ Figma) */
+.wb-poster,
+.wb-num,
+.wb-caption {
+    --u: calc(100cqw / 828);
+    position: absolute;
+    left: calc(var(--x) * var(--u));
+    top: calc(var(--y) * var(--u));
+}
+
+/* x,y = มุมบนซ้ายหลังหมุน → หมุนรอบมุมบนซ้ายเหมือน Figma */
+.wb-poster {
+    width: calc(var(--w) * var(--u));
+    height: calc(var(--h) * var(--u));
+    object-fit: cover;
+    transform-origin: 0 0;
+    transform: rotate(var(--r));
+    box-shadow: calc(2 * var(--u)) calc(6 * var(--u)) calc(10 * var(--u)) rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.wb-poster:hover {
+    transform: rotate(var(--r)) translateY(calc(-6 * var(--u)));
+}
+
+.wb-num {
+    width: calc(30.8 * var(--u));
+    height: calc(30.8 * var(--u));
+    border-radius: 50%;
+    background: #B5596E;
+    color: #fff;
+    font-family: "Libre Caslon Text", serif;
+    font-size: calc(13.3 * var(--u));
+    line-height: calc(30.8 * var(--u));
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.wb-caption {
+    --x: 72;
+    --y: 965;
+    width: calc(684 * var(--u));
+    margin: 0;
+    font-family: "Libre Caslon Text", serif;
+    font-size: calc(16 * var(--u));
+    line-height: calc(22 * var(--u));
+    text-align: justify;
+    color: #1C1A1B;
+}
