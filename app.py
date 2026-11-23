@@ -167,10 +167,10 @@ def page(active, *content, left=None, last=None, overlay=None): # โครง�
                 ], className="page-turn-right") if turn_back else None,
                 # หมุดดาวมุมซ้ายล่าง → หน้าก่อนหน้า (เฉพาะหน้าที่มีกระดาษซ้าย)
                 page_pin(prev_page, "prev") if left is not None else None,
-                # หน้า Home: ด้านในปกซ้ายมีช่องเสียบการ์ด (รูป cover_slots_left.png จาก Figma: Book → cover_slots_left)
-                # บัตร MOVIE LOVER CLUB เสียบในช่องล่าง — กล่อง .id-slot ตัดส่วนที่อยู่ใต้ช่องออก เหมือนเสียบลงไปในปก
-                html.Div(id_card(profile, after_turn=turn_back), className="id-slot") if active == "/journal" else None,
-                html.Img(src=app.get_asset_url("cover_slots_left.png"), className="cover-slots") if active == "/journal" else None,
+                # หน้า Home: ด้านในปกซ้าย = ดอกไม้ขาว ดาวทอง เพชร (รูป cover_left_decor.png จาก Figma: Book → open_book_spread_no_holder)
+                # บัตร MOVIE LOVER CLUB วางบนปกตรง ๆ ทับรูปตกแต่ง (กดแล้วเด้งขึ้นกลางจอ)
+                html.Img(src=app.get_asset_url("cover_left_decor.png"), className="cover-decor") if active == "/journal" else None,
+                html.Div(id_card(profile, after_turn=turn_back), className="id-on-cover") if active == "/journal" else None,
             ], className=cover_class),
             # ---- กระดาษขวา ----
             html.Div([
