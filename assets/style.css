@@ -1890,3 +1890,107 @@ div.id-card-input {
     text-align: justify;
     color: #1C1A1B;
 }
+
+
+/* ---------- ปฏิทินหนัง = หน้าขวาของ Wishlist (Figma: Book → calendar_page_flowers) ----------
+   พื้น = calendar_page.jpg (หัวข้อ, ลูกศร, ชื่อวัน, ตาราง) — ชื่อเดือน/วันที่/โปสเตอร์วางด้วยโค้ด (ตัวเลข = px ของ Figma) */
+.cal {
+    position: absolute;
+    inset: 0;
+    container-type: inline-size;
+}
+
+.cal-month,
+.cal-arrow,
+.cal-date,
+.cal-poster,
+.cal-more {
+    --u: calc(100cqw / 828);
+    position: absolute;
+    left: calc(var(--x) * var(--u));
+    top: calc(var(--y) * var(--u));
+}
+
+/* ชื่อเดือน: Lora แบบเดียวกับ quote Hugo */
+.cal-month {
+    width: calc(570 * var(--u));
+    height: calc(36 * var(--u));
+    line-height: calc(36 * var(--u));
+    text-align: center;
+    font-family: "Lora", Georgia, serif;
+    font-size: calc(22 * var(--u));
+    letter-spacing: calc(4 * var(--u));
+    text-transform: uppercase;
+    color: #6B5A50;
+    pointer-events: none;
+}
+
+/* ปุ่มใสทับลูกศร ‹ › ในรูป */
+.cal-arrow {
+    width: calc(36 * var(--u));
+    height: calc(36 * var(--u));
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.cal-arrow:hover {
+    background: rgba(107, 90, 80, 0.12);
+}
+
+.cal-date {
+    font-family: "Lora", Georgia, serif;
+    font-size: calc(15 * var(--u));
+    letter-spacing: calc(1.2 * var(--u));
+    line-height: 1.28;
+    color: #6B5A50;
+    pointer-events: none;
+}
+
+.cal-sun {
+    color: #B5525C;
+}
+
+/* โปสเตอร์ตรง ๆ กลางช่อง + เงาบาง ๆ */
+.cal-poster {
+    display: block;
+    width: calc(46 * var(--u));
+    height: calc(68 * var(--u));
+    border-radius: calc(1.5 * var(--u));
+    overflow: hidden;
+    background: #E9DFCB;
+    box-shadow: calc(1 * var(--u)) calc(2 * var(--u)) calc(3 * var(--u)) rgba(51, 36, 26, 0.35);
+    font: calc(8 * var(--u)) / 1.2 "Lora", Georgia, serif;   /* ไม่มีโปสเตอร์ → ชื่อเรื่องตัวเล็ก */
+    color: #6B5A50;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.cal-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cal-poster:hover {
+    transform: translateY(calc(-4 * var(--u)));
+}
+
+/* ดูหลายเรื่องวันเดียวกัน → ป้าย +N มุมขวาบนโปสเตอร์ */
+.cal-more {
+    width: calc(18 * var(--u));
+    height: calc(18 * var(--u));
+    border-radius: 50%;
+    background: #B5525C;
+    color: #fff;
+    font-family: "Lora", Georgia, serif;
+    font-size: calc(10 * var(--u));
+    line-height: calc(18 * var(--u));
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+}

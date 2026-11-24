@@ -1,5 +1,6 @@
+import calendar                 # จำนวนวันในแต่ละเดือน (ปฏิทินหน้าขวาของ Wishlist)
 import json
-import os                       # อ่านค่าจาก .env + สลับไฟล์
+import os                      # อ่านค่าจาก .env + สลับไฟล์
 import threading                # Lock กันเขียนไฟล์ชนกัน
 import uuid                     # สร้าง id ให้บันทึก
 from datetime import date       # วันที่วันนี้
@@ -1028,7 +1029,7 @@ def journal_spread_layout(last, n=1):
 # ---------- Wishlist (/my-journal = หน้าแรกของ My Journal): หนังที่อยากดู 6 เรื่องล่าสุด ----------
 # หน้าซ้าย = ตะกร้า (พื้น wishlist_basket_page.jpg จาก Figma: Book → wishlist_basket_page)
 #   โค้ดวางโปสเตอร์เอียงบนตะกร้า + วงกลมเลข 01–06 + คำบรรยายรายชื่อด้านล่าง
-# หน้าขวา = ว่างไว้ก่อน
+# หน้าขวา = ปฏิทินหนัง (ดูด้านล่าง)
 WISHLIST_PATH = "/my-journal"
 WISHLIST_MAX = 6
 # โปสเตอร์บนตะกร้า (ซ้าย, บน, กว้าง, สูง, องศาหมุนแบบ Figma) — x,y = มุมบนซ้ายของโปสเตอร์หลังหมุน (หน้ากว้าง 828)
@@ -1055,7 +1056,7 @@ def basket_poster(item, slot):
 
 
 def wishlist_layout(last):
-    """Wishlist: ซ้าย = ตะกร้า 6 เรื่อง (เรียงตามลำดับที่กด + Watchlist), ขวา = ว่าง"""
+    """Wishlist: ซ้าย = ตะกร้า 6 เรื่อง (เรียงตามลำดับที่กด + Watchlist), ขวา = ปฏิทินหนังเดือนนี้"""
     items = load_watchlist()[-WISHLIST_MAX:]
     caption = "; ".join(f"{i + 1:02d}: {item['title']}" for i, item in enumerate(items))
     left = html.Div([
@@ -1063,7 +1064,75 @@ def wishlist_layout(last):
         *sum((basket_poster(item, i) for i, item in enumerate(items)), []),
         html.P(caption, className="wb-caption") if caption else None,
     ], className="wl")
-    return page(WISHLIST_PATH, left=[left], last=last)
+    return page(WISHLIST_PATH, calendar_card(), left=[left], last=last)
+
+
+# ---------- ปฏิทินหนัง (หน้าขวาของ Wishlist) ----------
+# พื้น = calendar_page.jpg (Figma: Book → calendar_page_flowers ซ่อน sample แล้ว export)
+#   ในรูปมีหัวข้อ, ลูกศร ‹ ›, ชื่อวัน SUN–SAT และตาราง 6 แถว × 7 ช่อง
+#   โค้ดเติม: ชื่อเดือน, เลขวันที่, โปสเตอร์หนังที่ดูวันนั้น (จาก journal) + ปุ่มใสทับลูกศร (เปลี่ยนเดือนโดยไม่พลิกหน้า)
+CAL_X, CAL_Y = 129, 382          # มุมบนซ้ายของช่องแรก (px ของ Figma, หน้ากว้าง 828)
+CAL_COL, CAL_ROW = 570 / 7, 100  # ขนาดช่อง
+
+
+def calendar_month_view(year, month):
+    """ชื่อเดือน + เลขวันที่ + โปสเตอร์หนังที่ดูวันนั้น (กดแล้วไปหน้าคู่รีวิวของเรื่องนั้น)
+    ดูหลายเรื่องวันเดียวกัน → โชว์โปสเตอร์เรื่องแรก + ป้าย +N"""
+    lead = (date(year, month, 1).weekday() + 1) % 7   # ช่องว่างก่อนวันที่ 1 (สัปดาห์เริ่มวันอาทิตย์)
+    by_day = {}   # วันที่ → [(ลำดับใน journal, บันทึก), ...]
+    for i, e in enumerate(journal_entries()):
+        if e.get("date", "").startswith(f"{year}-{month:02d}-"):
+            by_day.setdefault(int(e["date"][8:10]), []).append((i, e))
+
+    cells = [html.Div(f"{calendar.month_name[month]} {year}", className="cal-month", style={"--x": 129, "--y": 288})]
+    for day in range(1, calendar.monthrange(year, month)[1] + 1):
+        row, col = divmod(lead + day - 1, 7)
+        x, y = CAL_X + col * CAL_COL, CAL_Y + row * CAL_ROW
+        cells.append(html.Div(str(day), className="cal-date cal-sun" if col == 0 else "cal-date",
+                              style={"--x": x + 7, "--y": y + 5}))
+        if day not in by_day:
+            continue
+        i, e = by_day[day][0]
+        poster = e.get("poster") or tmdb_lookup(e["title"])[1]
+        px, py = x + CAL_COL / 2 + 6 - 23, y + 26   # โปสเตอร์ 46×68 กลางช่อง (ตาม Figma)
+        cells.append(dcc.Link(
+            html.Img(src=f"{TMDB_IMAGE}/w154{poster}") if poster else e["title"],
+            href=journal_page_path(i // JOURNAL_PER_PAGE + 1), title=e["title"],
+            className="cal-poster", style={"--x": px, "--y": py}))
+        if len(by_day[day]) > 1:
+            cells.append(html.Div(f"+{len(by_day[day]) - 1}", className="cal-more",
+                                  style={"--x": px + 36, "--y": py - 8}))
+    return cells
+
+
+def calendar_card():
+    """ปฏิทินทั้งหน้า: เปิดมาเป็นเดือนนี้ กด ‹ › แล้วเปลี่ยนเดือน (callback change_month)"""
+    today = date.today()
+    return html.Div([
+        html.Img(src=app.get_asset_url("calendar_page.jpg"), className="search-page-art"),
+        html.Div(calendar_month_view(today.year, today.month), id="cal-body"),
+        # ปุ่มใสทับลูกศรในรูป
+        html.Button(id="cal-prev", title="Previous month", className="cal-arrow", style={"--x": 129, "--y": 288}),
+        html.Button(id="cal-next", title="Next month", className="cal-arrow", style={"--x": 663, "--y": 288}),
+        dcc.Store(id="cal-month", data=[today.year, today.month]),   # เดือนที่เปิดอยู่
+    ], className="cal")
+
+
+@app.callback(
+    Output("cal-body", "children"),
+    Output("cal-month", "data"),
+    Input("cal-prev", "n_clicks"),
+    Input("cal-next", "n_clicks"),
+    State("cal-month", "data"),
+    prevent_initial_call=True,
+)
+def change_month(prev_clicks, next_clicks, shown):
+    if not (prev_clicks or next_clicks):   # ปุ่มเพิ่งโผล่มาตอนเปิดหน้า (ยังไม่ได้กด)
+        return no_update, no_update
+    # เดือนเป็นเลขเดียว (ปี × 12 + เดือน) → +1/-1 แล้วแปลงกลับ ข้ามปีได้เอง
+    i = shown[0] * 12 + shown[1] - 1 + (1 if ctx.triggered_id == "cal-next" else -1)
+    year, month = i // 12, i % 12 + 1
+    return calendar_month_view(year, month), [year, month]
 
 
 
