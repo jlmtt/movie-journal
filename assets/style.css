@@ -125,7 +125,7 @@ a.book-tab:hover,
     color: #4A3B35;
 }
 
-/* ปกสมุด = รูป login_cover.png (export จาก Figma: หัวข้อ, quote, กรอบ PASSWORD, Open, COPYRIGHT, เงาสัน) */
+/* ปกสมุด = รูป book_cover.png (export จาก Figma: หัวข้อ, quote, กรอบ PASSWORD, Open, COPYRIGHT, เงาสัน) */
 .book-cover {
     position: absolute;
     inset: 0;

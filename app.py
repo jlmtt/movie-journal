@@ -762,13 +762,6 @@ def search_movie(n_clicks, n_submit, title):
     ], title
 
 
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-# ---------- ส่วนที่เหลือ (Movie detail / My Journal / Watchlist / Calendar) — ไว้ก่อน ----------
-# ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-
-
 # ============================================================
 # ไฟล์ข้อมูล journal / watchlist + ตั๋วรีวิว
 # ============================================================
@@ -821,36 +814,6 @@ def list_buttons(title):
     # (ข้อความปุ่ม Watchlist, ปิดปุ่มไหม, ข้อความปุ่มดูแล้ว)
     return (("✓ Watchlist" if wanted else "+ Watchlist"), wanted or watched,
             ("✓ Watched · see journal" if watched else "Mark as watched"))
-
-
-# ส่วนประกอบที่ใช้ซ้ำ
-def navbar(active):
-    """สร้างแถบเมนูด้านบน โดยไฮไลต์ลิงก์ของหน้าที่กำลังเปิดอยู่ (active)"""
-
-    def link(label, href):
-        # ถ้าเป็นหน้าปัจจุบัน ให้เพิ่ม class "active" เพื่อให้ CSS ไฮไลต์
-        cls = "nav-link active" if href == active else "nav-link"
-        return dcc.Link(label, href=href, className=cls)
-
-    return html.Div([
-        # ลิงก์ไปยังหน้าต่าง ๆ
-        html.Div([
-            link("Home", "/journal"),
-            link("Library", "/library"),
-            link("Challenge", "/challenge"),
-            link("Calendar", "/calendar"),
-        ], className="nav-links"),
-
-        # ช่องค้นหาหนัง + ปุ่มค้นหา
-        html.Div([
-            dcc.Input(id="movie-title", type="text", placeholder="Search movie"),
-            html.Button("🔍", id="search-button"),
-        ], className="nav-search"),
-
-        # ปุ่มไปหน้า Journal ส่วนตัว
-        dcc.Link("Journal", href="/my-journal", className="nav-button"),
-    ], className="navbar")
-
 
 
 # ============================================================
