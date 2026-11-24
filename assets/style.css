@@ -478,7 +478,7 @@ a.book-tab:hover,
     border-radius: 17px;                /* มุมมนตามบัตรใน Figma (34 ÷ 2) */
     background: url("id_card_template.jpg") 0 0 / 100% 100%;   /* พื้นบัตรทั้งใบ export จาก Figma (Components → id_card_license) */
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    transform: rotate(5deg) scale(0.31);    /* วางบนปกซ้าย เอียงขวาลง 5° ย่อเหลือ ~236×155 */
+    transform: rotate(-5deg) scale(0.31);   /* วางบนปกซ้าย เอียงซ้ายลง 5° ย่อเหลือ ~236×155 */
     font-family: "Courier Prime", "Courier New", monospace;
     color: #4A3B35;
     overflow: visible;                  /* ให้คลิปหนีบยื่นพ้นขอบบนได้ */
@@ -684,7 +684,7 @@ a.book-tab:hover,
 }
 
 .id-card-preview:hover {
-    transform: translateY(-8px) rotate(5deg) scale(0.31);   /* ชี้แล้วการ์ดยกขึ้นนิดนึง */
+    transform: translateY(-8px) rotate(-5deg) scale(0.31);   /* ชี้แล้วการ์ดยกขึ้นนิดนึง */
 }
 
 /* ตอนการ์ดเด้งออกมา: ซ่อนการ์ดในซอง (เหมือนถูกดึงออกไปแล้ว) */
@@ -744,7 +744,7 @@ div.id-card-input {
     z-index: 1;
     opacity: 0;
     transform-origin: center;
-    transform: translate(-230px, 20px) scale(0.36) rotate(5deg);   /* เริ่มจากตำแหน่งการ์ดบนปกซ้าย */
+    transform: translate(-230px, 20px) scale(0.36) rotate(-5deg);   /* เริ่มจากตำแหน่งการ์ดบนปกซ้าย */
     transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.15s ease;
     animation: none;
 }
