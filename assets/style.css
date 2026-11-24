@@ -475,12 +475,12 @@ a.book-tab:hover,
     transform-origin: center;
     z-index: 4;                         /* บนสุดของ 3 แผ่น */
     box-sizing: border-box;
-    border-radius: 14px;
-    background: url("id_card_template.png") 0 0 / 100% 100%;   /* พื้นบัตรทั้งใบ export จาก Figma */
+    border-radius: 17px;                /* มุมมนตามบัตรใน Figma (34 ÷ 2) */
+    background: url("id_card_template.jpg") 0 0 / 100% 100%;   /* พื้นบัตรทั้งใบ export จาก Figma (Components → id_card_license) */
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     transform: rotate(-5deg) scale(0.31);   /* เสียบแนวตั้งในซอง (หมุนตามเข็ม ~90° รูปอยู่บน), ย่อเหลือ ~180×274 */
     font-family: "Courier Prime", "Courier New", monospace;
-    color: #1E1A18;
+    color: #4A3B35;
     overflow: visible;                  /* ให้คลิปหนีบยื่นพ้นขอบบนได้ */
     animation: home-envelope-in 0.6s ease 0.1s both;
 }
@@ -490,7 +490,7 @@ a.book-tab:hover,
     animation: home-envelope-in 0.15s linear 0.85s both;
 }
 
-/* ---- ข้อมูลบนบัตร: ตำแหน่งทั้งหมด = ตำแหน่งช่องในรูป id_card_template.png (Figma, หน่วย 2 เท่า) ---- */
+/* ---- ข้อมูลบนบัตร: ตำแหน่งทั้งหมด = ตำแหน่งช่องในรูป id_card_template.jpg (Figma, หน่วย 2 เท่า) ---- */
 /* รูปเต็มความสูงด้านซ้าย + ลวดเย็บ */
 .id-card-photo-wrap {
     position: absolute;
@@ -567,7 +567,7 @@ a.book-tab:hover,
     font-family: "Courier Prime", "Courier New", monospace;
     font-size: 24px;
     line-height: 27px;
-    color: #1E1A18;
+    color: #4A3B35;
 }
 
 .isic-name     { top: 163px; left: 344px; width: 240px; }
@@ -610,17 +610,16 @@ a.book-tab:hover,
     transform: translate(-50%, -34%) rotate(-5deg);
 }
 
-/* เลขสมาชิกสีแดง ใต้ "Nº MJ" */
+/* เลขสมาชิกสีชมพูกุหลาบ ใต้ "# OF MEMBER" */
 .isic-no {
-    position: absolute;                 /* ตำแหน่ง/ฟอนต์ตาม Figma (id_card_template → Member no) ÷ 2 */
+    position: absolute;                 /* ตำแหน่ง/ฟอนต์ตาม Figma (id_card_license → Member no) ÷ 2 */
     top: 136px;
     left: 617px;
-    font-family: "Oswald", "Roboto Condensed", sans-serif;
-    font-weight: 300;
-    font-size: 38px;
-    letter-spacing: 2px;
-    line-height: 56px;
-    color: #A3453B;
+    font-family: "Space Mono", "Courier Prime", monospace;
+    font-size: 25px;
+    letter-spacing: 1.5px;
+    line-height: 37px;
+    color: #B5525C;
 }
 
 /* วันที่เขียนมือหมึกน้ำเงิน ใต้ PLACE AND DATE */
@@ -664,29 +663,28 @@ a.book-tab:hover,
     color: rgba(40, 44, 48, 0.75);
 }
 
-/* ปีสีเขียว + DEC 31 ตรงช่อง VALID (ตำแหน่ง/ฟอนต์ตาม Figma id_card_template ÷ 2) */
+/* ปี + DEC 31 สีชมพูกุหลาบ มุมขวาล่าง (ตำแหน่ง/ฟอนต์ตาม Figma id_card_license ÷ 2) */
 .isic-stamp-year {
     position: absolute;
-    top: 370px;
-    left: 626px;
-    font-family: "Oswald", "Anton", sans-serif;
-    font-weight: 700;
+    top: 405px;
+    left: 650px;
+    font-family: "Anton", "Oswald", sans-serif;
     font-size: 32px;
-    line-height: 47px;
-    color: #8CC25C;
+    line-height: 48px;
+    color: #B5525C;
     pointer-events: none;
 }
 
 .isic-stamp-valid {
     position: absolute;
-    top: 388px;
-    left: 706px;
-    font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
-    font-size: 10px;
+    top: 452px;
+    left: 652px;
+    font-family: "Space Mono", "Courier Prime", monospace;
+    font-size: 9px;
     font-weight: 700;
     line-height: 12px;
     white-space: nowrap;
-    color: #8CC25C;
+    color: #B5525C;
     pointer-events: none;
 }
 

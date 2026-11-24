@@ -231,7 +231,7 @@ def member_number(name): # เปลี่ยนตามชื่อ
 
 def id_card_body(profile, editable):
     """ข้อมูลบนการ์ด MOVIE LOVER CLUB — พื้นบัตรทั้งใบ (ลายกันปลอม, หัวบัตร, ช่อง, MEMBER, VALID ฯลฯ)
-    เป็นรูปเดียว id_card_template.png (export จาก Figma: หน้า Assets → export/id_card_template)
+    เป็นรูปเดียว id_card_template.jpg (export จาก Figma: หน้า Components → id_card_license)
     ฟังก์ชันนี้วางเฉพาะข้อมูลทับลงในช่องของรูป (ตำแหน่งแต่ละชิ้นอยู่ใน style.css ตามตำแหน่งใน Figma)
     ใช้ทั้งการ์ดในซองและการ์ดที่เด้งออกมากลางจอ
     editable=False: การ์ดในซอง แสดงข้อมูลอย่างเดียว (กดแล้วเด้งออกมา)
