@@ -249,9 +249,6 @@ def id_card_body(profile, editable):
     photo = photo_preview(profile.get("photo"))
     number = member_number(name)
 
-    def stamp(cls):
-        return html.Div(html.Div(" ".join(number), className="mlc-stamp-no"), className=f"mlc-stamp {cls}")
-
     return [
         # รูป (การ์ดกลางจอ: คลิกรูปแล้วเลือกรูปจากเครื่อง) + คลิปหนีบด้านบน
         html.Div([
@@ -267,8 +264,6 @@ def id_card_body(profile, editable):
         value("since", "2026"),
         value("favorite", "..."),
         html.Div(f"BKK  {date.today():%-m/%-d/%y}", className="isic-hand-date"),
-        stamp("isic-stamp-photo"),
-        stamp("isic-stamp-right"),
         html.Div(str(date.today().year), className="isic-stamp-year"),
         html.Div("DEC 31", className="isic-stamp-valid"),
     ]
