@@ -183,10 +183,8 @@ def page(active, *content, left=None, last=None, overlay=None): # โครง�
                 html.Div(list(content), className="home-content"),
                 # หมุดดาวมุมขวาล่าง → หน้าถัดไป
                 page_pin(next_page, "next"),
-                # หน้า Home: 3 แผ่นวางซ้อนแบบคอลลาจ (ไม่มีซองแล้ว)
-                # ล่างสุด = กระดาษ This or That เต็มหน้า, ทับขวาบน = โปสการ์ดหนัง (บัตร MOVIE LOVER CLUB อยู่ในช่องปกซ้าย)
+                # หน้า Home: กระดาษ This or That เต็มหน้า (บัตร MOVIE LOVER CLUB อยู่ในช่องปกซ้าย)
                 this_or_that_preview(profile, after_turn=turn_back) if active == "/journal" else None,
-                movie_postcard(profile, after_turn=turn_back) if active == "/journal" else None,
                 # หน้ากระดาษที่กำลังพลิกไปซ้าย: ด้านหน้า = หน้าขวาของหน้าก่อนหน้า
                 # พลิกข้ามสันไปซ้าย → ด้านหลังกลายเป็นกระดาษซ้ายของหน้าใหม่
                 html.Div([
@@ -199,7 +197,6 @@ def page(active, *content, left=None, last=None, overlay=None): # โครง�
         ], className="home-book"),
         # การ์ดที่เด้งออกมากลางจอ
         id_card_modal(profile) if active == "/journal" else None,
-        movie_postcard_modal(profile) if active == "/journal" else None,
         this_or_that_modal(profile) if active == "/journal" else None,
         overlay,
     ], className="home-page")
@@ -274,47 +271,6 @@ def id_card(profile, after_turn=False):
     """การ์ดสีขาวเสียบอยู่หลังซอง — กดแล้วเด้งออกมากลางจอ"""
     return html.Div(id_card_body(profile, editable=False), id="id-card-preview", n_clicks=0,
                     className="id-card id-card-preview after-turn" if after_turn else "id-card id-card-preview")
-
-
-def postcard_image(movie):
-    """รูปบนโปสการ์ดหนัง: ภาพฉากหนัง (ไม่มี → โปสเตอร์) ครอปกลางภาพเป็นกรอบแนวตั้ง (ใน CSS)
-    ยังไม่ได้เลือกหนัง → ข้อความให้กดเลือก"""
-    if not movie:   # ยังไม่เลือกหนัง
-        return html.Div("pick a movie ✎", className="mpc-img mpc-img-empty")
-    image = movie.get("backdrop") or movie.get("poster")   # ใช้ภาพฉากก่อน ไม่มีค่อยใช้โปสเตอร์
-    return html.Img(src=f"{TMDB_IMAGE}/w780{image}", className="mpc-img", title=movie.get("title"))
-
-
-def movie_postcard(profile, after_turn=False):
-    """โปสการ์ดหนังกรอบขาว เสียบอยู่ในซองทับการ์ด MOVIE LOVER CLUB — กดแล้วเด้งขึ้นมาเลือกหนังได้
-    หนังที่เลือกเก็บใน data/profile.json ("postcard")"""
-    movie = profile.get("postcard")
-    # กรอบขาว + ดาวเงิน = รูป postcard_template.png (Figma: Components → postcard_template) วางทับใน CSS
-    # โค้ดวางแค่รูปหนังให้โผล่ตรงช่องใสของกรอบ
-    return html.Div(html.Div(postcard_image(movie), id="mpc-preview-img", className="mpc-photo"),
-                    id="mpc-preview", n_clicks=0,
-                    className="mpc mpc-preview after-turn" if after_turn else "mpc mpc-preview")
-
-
-def movie_postcard_modal(profile):
-    """โปสการ์ดหนังกลางจอ + ช่องค้นหาหนัง: เลือกผลค้นหา → โปสการ์ดเปลี่ยนเป็นหนังเรื่องนั้นทันที"""
-    movie = profile.get("postcard")
-    return html.Div([
-        html.Div(id="mpc-backdrop", n_clicks=0, className="id-backdrop"),   # พื้นหลังมืด (กดเพื่อปิด)
-        html.Div([
-            # โปสการ์ดใบใหญ่
-            html.Div(html.Div(postcard_image(movie), id="mpc-modal-img", className="mpc-photo"),
-                     className="mpc mpc-big"),
-            html.Div(movie.get("title", "") if movie else "", id="mpc-title", className="mpc-caption"),   # ชื่อหนังใต้โปสการ์ด
-            # ค้นหาหนังมาใส่โปสการ์ด (ช่องแคปซูลแบบหน้า Search)
-            html.Div([
-                html.Button(id="mpc-search-btn", title="Search", className="search-icon mpc-search-icon"),
-                dcc.Input(id="mpc-search", type="text", placeholder="search a movie for this postcard",
-                          debounce=True, className="mpc-search-input"),
-            ], className="mpc-search"),
-            html.Div(id="mpc-results", className="mpc-results"),   # ผลค้นหา (โปสเตอร์เล็กให้กดเลือก)
-        ], className="mpc-modal-body"),
-    ], id="mpc-modal", className="id-modal")
 
 
 # This or That
@@ -610,63 +566,6 @@ def update_profile(photo, *values):
     preview = photo_preview(profile.get("photo"))
     # ลำดับต้องตรงกับ Output ด้านบน
     return preview, preview, *values, profile.get("name", ""), profile.get("name", "")
-
-
-
-# ---------- 6.2.0.6 หน้า Home: โปสการ์ดหนังในซอง — เปิด/ปิด, ค้นหา, เลือกหนัง ----------
-@app.callback(
-    Output("mpc-modal", "className"),    # เพิ่ม class "open" → โปสการ์ดเด้งกลางจอ
-    Input("mpc-preview", "n_clicks"),    # กดโปสการ์ดในซอง
-    Input("mpc-backdrop", "n_clicks"),   # กดพื้นหลังมืด
-    prevent_initial_call=True,
-)
-def toggle_postcard(open_clicks, close_clicks):
-    return "id-modal open" if ctx.triggered_id == "mpc-preview" else "id-modal"
-
-
-@app.callback(
-    Output("mpc-results", "children"),     # ผลค้นหา
-    Input("mpc-search-btn", "n_clicks"),   # กดแว่นขยาย
-    Input("mpc-search", "value"),          # กด Enter (debounce)
-    prevent_initial_call=True,
-)
-def search_postcard(n_clicks, title):
-    """ผลค้นหา 6 เรื่องแรก เป็นโปสเตอร์เล็ก ๆ ให้กดเลือก"""
-    if not title:   # ช่องว่าง → ไม่แสดง
-        return None
-    try:
-        # เอาเฉพาะเรื่องที่มีโปสเตอร์
-        movies = [m for m in tmdb_get("/search/movie", query=title)["results"] if m.get("poster_path")][:6]
-    except requests.RequestException:   # เน็ตหลุด
-        return html.Div("Couldn't reach TMDB.", className="mpc-note")
-    if not movies:
-        return html.Div("No results found.", className="mpc-note")
-    # ปุ่มละ 1 เรื่อง: id มีรหัสหนัง → pick_postcard รู้ว่าเลือกเรื่องไหน
-    return [html.Button([html.Img(src=f"{TMDB_IMAGE}/w154{m['poster_path']}"),
-                         html.Span(f"{m['title']} ({movie_year(m)})")],
-                        id={"type": "mpc-pick", "index": m["id"]}, className="mpc-pick", title=m["title"])
-            for m in movies]
-
-
-@app.callback(
-    Output("mpc-preview-img", "children"),                   # รูปโปสการ์ดในซอง
-    Output("mpc-modal-img", "children"),                     # รูปโปสการ์ดกลางจอ
-    Output("mpc-title", "children"),                         # ชื่อหนังใต้โปสการ์ด
-    Input({"type": "mpc-pick", "index": ALL}, "n_clicks"),   # ปุ่มผลค้นหาทุกปุ่ม
-    prevent_initial_call=True,
-)
-def pick_postcard(clicks):
-    """กดโปสเตอร์ในผลค้นหา → บันทึกลง profile.json แล้วเปลี่ยนรูปบนโปสการ์ด (ทั้งในซองและกลางจอ)"""
-    if not ctx.triggered_id or not any(clicks):   # ปุ่มเพิ่งโผล่ (ยังไม่ได้กด)
-        return no_update, no_update, no_update
-    movie = tmdb_get(f"/movie/{ctx.triggered_id['index']}")   # ดึงข้อมูลเต็มของเรื่องที่กด
-    chosen = {"id": movie["id"], "title": movie["title"],
-              "backdrop": movie.get("backdrop_path"), "poster": movie.get("poster_path")}
-    profile = load_profile()
-    profile["postcard"] = chosen
-    save_profile(profile)
-    image = postcard_image(chosen)
-    return image, image, chosen["title"]
 
 
 

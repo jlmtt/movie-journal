@@ -1832,9 +1832,15 @@ div.id-card-input {
 }
 
 .wl {
+    /* วางที่ขนาดจริงของ Figma (828×1136) แล้วย่อทั้งแผ่นให้พอดีกระดาษซ้าย (404×568)
+       ไม่ย่อตัวหนังสือทีละตัว → Firefox ที่ตั้งขนาดตัวอักษรขั้นต่ำ (เช่นภาษาไทย) จะไม่ขยายตัวหนังสือจนเลื่อนออกนอกตำแหน่ง */
     position: absolute;
-    inset: 0;
-    container-type: inline-size;
+    left: 0;
+    top: 0;
+    width: 828px;
+    height: 1136px;
+    transform-origin: 0 0;
+    transform: scale(calc(404 / 828), calc(568 / 1136));
 }
 
 
@@ -1844,7 +1850,7 @@ div.id-card-input {
 .wb-poster,
 .wb-num,
 .wb-caption {
-    --u: calc(100cqw / 828);
+    --u: 1px;
     position: absolute;
     left: calc(var(--x) * var(--u));
     top: calc(var(--y) * var(--u));
@@ -1895,9 +1901,14 @@ div.id-card-input {
 /* ---------- ปฏิทินหนัง = หน้าขวาของ Wishlist (Figma: Book → calendar_page_flowers) ----------
    พื้น = calendar_page.jpg (หัวข้อ, ลูกศร, ชื่อวัน, ตาราง) — ชื่อเดือน/วันที่/โปสเตอร์วางด้วยโค้ด (ตัวเลข = px ของ Figma) */
 .cal {
+    /* วางที่ขนาดจริงของ Figma (828×1136) แล้วย่อทั้งแผ่นให้พอดีกระดาษขวา (414×568) — เหตุผลเดียวกับ .wl */
     position: absolute;
-    inset: 0;
-    container-type: inline-size;
+    left: 0;
+    top: 0;
+    width: 828px;
+    height: 1136px;
+    transform-origin: 0 0;
+    transform: scale(calc(414 / 828), calc(568 / 1136));
 }
 
 .cal-month,
@@ -1905,7 +1916,7 @@ div.id-card-input {
 .cal-date,
 .cal-poster,
 .cal-more {
-    --u: calc(100cqw / 828);
+    --u: 1px;
     position: absolute;
     left: calc(var(--x) * var(--u));
     top: calc(var(--y) * var(--u));
